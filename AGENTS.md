@@ -122,6 +122,26 @@ Examples:
 - `Codex: verify all cell placements go through SimulationService.place_cell().`
 - `GPT: review whether the slice plan creates micro-slicing or hidden coupling.`
 
+## External Evaluation Intake
+
+When the user provides an external analysis, evaluation, review, or cross-agent critique, treat it as structured implementation input, not as background context.
+
+Required process:
+
+- Extract every concrete finding into an internal checklist before editing.
+- Preserve the reviewer's priority labels such as `P0`, `P1`, and `P2`.
+- For each finding, decide one explicit action: `implement`, `document as open finding`, or `reject with reason`.
+- Do not merge several findings into a vague "addressed review feedback" bucket.
+- P0 items block further implementation until fixed, unless the user explicitly overrides them.
+- P1 items should be fixed before the next slice unless explicitly deferred by the user.
+- P2 items may be documented as future work, but if the user asks to implement all P2 items, implement them or state the exact blocker.
+- If a finding changes architecture, public APIs, simulation truth, assets, adapters, or validation strategy, update the relevant docs and tests.
+- After implementation, report evidence per finding group: changed files, tests/searches run, remaining open items.
+
+Guardrail:
+
+- Do not claim an external review was implemented just because the general intent was followed. Each actionable point needs a traceable code, test, documentation, or explicit deferral outcome.
+
 ## Completion Protocol
 
 Every implementation response includes:
