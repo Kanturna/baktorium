@@ -1,12 +1,14 @@
 extends SceneTree
 
 const CellFunctionCatalog = preload("res://src/sim/catalog/cell_function_catalog.gd")
+const HexRenderConfig = preload("res://src/rendering/hex_render_config.gd")
 
 
 func _initialize() -> void:
 	var failures: Array[String] = []
 	_validate_assets_exist(failures)
 	_validate_sprite_frames(failures)
+	_validate_sprite_diameter_sanity(failures)
 	_validate_catalog_visual_schema(failures)
 	_validate_source_boundaries(failures)
 	_validate_docs(failures)
@@ -52,6 +54,33 @@ func _validate_sprite_frames(failures: Array[String]) -> void:
 			var texture = frames.get_frame_texture(&"default", index)
 			if texture == null:
 				failures.append("SpriteFrames frame %d has no texture: %s." % [index, path])
+			elif texture is AtlasTexture:
+				_validate_integer_region(texture as AtlasTexture, path, index, failures)
+
+
+func _validate_integer_region(texture: AtlasTexture, path: String, index: int, failures: Array[String]) -> void:
+	var region = texture.region
+	if not _is_integer_float(region.position.x) or not _is_integer_float(region.position.y):
+		failures.append("SpriteFrames frame %d has non-integer region position: %s." % [index, path])
+	if not _is_integer_float(region.size.x) or not _is_integer_float(region.size.y):
+		failures.append("SpriteFrames frame %d has non-integer region size: %s." % [index, path])
+
+
+func _validate_sprite_diameter_sanity(failures: Array[String]) -> void:
+	var config = load("res://resources/render/starter_bacterium_render_config.tres") as HexRenderConfig
+	if config == null:
+		failures.append("Starter render config failed to load for sprite diameter sanity.")
+		return
+	var target_diameter = config.hex_radius * 2.0 * config.sprite_diameter_scale
+	var max_reasonable_diameter = config.hex_radius * 2.0 * 1.5
+	if target_diameter > max_reasonable_diameter:
+		failures.append("Sprite diameter scale is too large for readable neighboring hexes.")
+	if config.sprite_diameter_scale > 1.5:
+		failures.append("sprite_diameter_scale should stay <= 1.5 before batched/atlas visual retuning.")
+
+
+func _is_integer_float(value: float) -> bool:
+	return absf(value - floorf(value)) <= 0.0001
 
 
 func _validate_catalog_visual_schema(failures: Array[String]) -> void:

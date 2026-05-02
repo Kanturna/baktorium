@@ -58,7 +58,7 @@ func _ready() -> void:
 
 	_create_camera()
 	world_environment = WorldEnvironmentAdapter.ensure_single_instance(self)
-	ambient_particles = ParticleEffectAdapter.setup_world_ambient(self)
+	ambient_particles = ParticleEffectAdapter.setup_world_ambient(renderer)
 
 	_create_ui()
 	_apply_render_mode()

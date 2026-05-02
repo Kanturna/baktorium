@@ -167,7 +167,7 @@ Aktive Belegung pro Funktion:
 `HexRenderConfig` bekommt zwei Felder für Sprite-Größen-Berechnung:
 
 ```gdscript
-@export_range(1.0, 3.0, 0.05) var sprite_diameter_scale: float = 2.2
+@export_range(1.0, 3.0, 0.05) var sprite_diameter_scale: float = 1.1
 @export_range(8, 4096, 8) var sprite_source_size: int = 1024
 ```
 
@@ -178,14 +178,12 @@ target_diameter = hex_radius * 2.0 * sprite_diameter_scale
 sprite_scale = target_diameter / sprite_source_size
 ```
 
-`sprite_diameter_scale = 2.2` heißt: das Sprite ist 10% breiter als
-der Hex-Diameter, sodass der Sprite-Frame mit Eck-Knoten leicht
-über die Hex-Geometrie hinausragt — sauberer optischer Übergang
-zwischen Zellen.
+`sprite_diameter_scale = 1.1` heißt: das Sprite ist 10% breiter als
+der Hex-Diameter. Der frühere Planwert `2.2` ist verworfen, weil er
+Nachbarzellen massiv überlappt.
 
-**Test (A2):** mit `hex_radius = 42` und `sprite_source_size = 1024`
-ergibt sich `sprite_scale ≈ 0.090`. Bei `hex_radius = 60` ergibt
-sich `sprite_scale ≈ 0.129`.
+**Test (A2):** mit `hex_radius = 42`, `sprite_diameter_scale = 1.1`
+und einer 1254px-Textur ergibt sich `sprite_scale` nahe `0.074`.
 
 **Hinweis Mip-Mapping:** Bei `sprite_scale < 0.5` Mipmap-Filter in
 `.import` aktivieren.
@@ -386,9 +384,9 @@ Multi-Organism-Following relevant wird.
   Instanziierung
 - Debug-Mode-Source enthält Polygon-Draw-Call (alte Logik)
 - `KEY_G` mit Mode-Toggle-Logik im Lab
-- **Sprite-Scale-Test:** mit `hex_radius = 42` und
-  `sprite_source_size = 1024` ergibt sich `sprite_scale ≈ 0.090`
-  (±0.005)
+- **Sprite-Scale-Test:** mit `hex_radius = 42`, `sprite_diameter_scale = 1.1`
+  und gemessener Texturgroesse ergibt sich ein stabiler, kleiner
+  Ueberlappungssaum ohne Nachbarzellen zu verdecken.
 - **Animation-Modulation-Test:** speed_scale-Werte für
   modulator=0/0.5/1.0 ergeben 0.5/1.0/1.5
 - **Boundary-Switch-Test:** synthetischer 19-Zellen-Cluster,
@@ -525,7 +523,7 @@ Inhalt siehe Sektion 1.
 - Loop einfach (kein Pingpong)
 - Renderer-Compound: AnimatedSprite2D + Sprite2D-Kinder im Beauty-
   Mode, Polygon-`_draw()` nur in Debug-Mode
-- Sprite-Skalierung: `sprite_diameter_scale = 2.2` Default
+- Sprite-Skalierung: `sprite_diameter_scale = 1.1` Default nach Claude-Coach-Sign-off-Korrektur
 - Schema: `outer_sprite_texture`, `inner_sprite_texture`,
   `sprite_frames`, `animation_base_fps`, `animation_modulation_strength`
 - Provenance: ChatGPT (User-Account), OpenAI Content Policy

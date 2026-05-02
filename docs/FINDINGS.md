@@ -34,3 +34,10 @@ Use this file for bugs, review findings, debug notes, risks, and planned correct
 - Added stress-test and snapshot-boundary validation for energy.
 - Separated low-energy render hints from copied simulation energy metrics after Claude Code review.
 - Added built-in `Camera2D` lab pan/zoom/reset controls without introducing a camera plugin.
+
+### 2026-05-02 - Claude Coach Beauty Layer Review
+
+- Reduced `sprite_diameter_scale` from `2.2` to `1.1` after manual sign-off exposed excessive sprite overlap.
+- Re-parented ambient particles to the organism renderer so they spawn around the bacterium center.
+- Regenerated SpriteFrame atlas regions as integer pixel rectangles to avoid animation sub-pixel jitter.
+- Added validation for sprite diameter sanity, integer atlas regions, and particle anchoring.

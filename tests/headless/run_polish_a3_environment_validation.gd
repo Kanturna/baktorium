@@ -62,6 +62,8 @@ func _validate_lab_stress_hook(failures: Array[String]) -> void:
 	for required in ["use_stress_body", "stress_cell_count", "_build_stress_body", "service.place_cell"]:
 		if not source.contains(required):
 			failures.append("Lab stress hook missing %s." % required)
+	if not source.contains("ParticleEffectAdapter.setup_world_ambient(renderer)"):
+		failures.append("Ambient particles should be parented to the renderer, not the lab root.")
 	if source.contains("lab_camera_adapter") or source.contains("PhantomCamera"):
 		failures.append("Iter A should not introduce a camera adapter or PhantomCamera.")
 

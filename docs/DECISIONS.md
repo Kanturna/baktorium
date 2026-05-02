@@ -146,11 +146,14 @@ Schema:
 Rules:
 
 - SpriteFrames are built from measured 5x2 sheet dimensions; the implementation must not assume 1024 px or exact divisibility by 5.
+- SpriteFrame atlas regions use integer pixel rectangles to avoid sub-pixel sampling jitter between animation frames.
 - Mipmaps are required for cell textures because the lab camera supports mouse-wheel zoom.
 - Wall cells use the outer sprite on boundary cells and the inner sprite on interior cells.
 - Beauty mode uses pooled `Sprite2D` and `AnimatedSprite2D` children; Debug mode hides those children and uses the polygon `_draw()` path.
 - `G` toggles Beauty/Debug because `D` belongs to camera pan.
 - `hex_radius` remains `42.0` until the Beauty-mode sign-off explicitly changes visual scale.
+- `sprite_diameter_scale` defaults to `1.1`, giving a small glow overlap without covering neighboring cells.
+- Ambient particles are parented to the organism renderer so they appear around the bacterium center rather than the lab origin.
 
 Provenance: cell sprites and animation sheets were provided by the user from their ChatGPT/OpenAI workflow. Non-selected variants stay in `_alternates/` until the visual direction is signed off.
 

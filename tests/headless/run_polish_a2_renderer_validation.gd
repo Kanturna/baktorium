@@ -94,13 +94,15 @@ func _validate_render_config(failures: Array[String]) -> void:
 		failures.append("Boundary glow should default to false.")
 	if config.show_debug_overlay:
 		failures.append("Debug overlay should default off in beauty mode.")
+	if config.sprite_diameter_scale != 1.1:
+		failures.append("sprite_diameter_scale should default to 1.1 after visual sign-off correction.")
 
 
 func _validate_sprite_scale(failures: Array[String]) -> void:
 	var renderer = HexOrganismRenderer.new()
 	var config = HexRenderConfig.new()
 	config.hex_radius = 42.0
-	config.sprite_diameter_scale = 2.2
+	config.sprite_diameter_scale = 1.1
 	renderer.render_config = config
 	var texture = load("res://assets/textures/cell_functions/energy_core.png")
 	var cell_data = {"sprite_texture": texture, "sprite_frames": null}

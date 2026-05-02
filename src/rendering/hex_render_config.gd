@@ -4,7 +4,7 @@ extends Resource
 @export_range(12.0, 96.0, 1.0) var hex_radius: float = 42.0
 @export var pointy_top: bool = true
 @export_enum("beauty", "debug") var render_mode: String = "beauty"
-@export_range(1.0, 3.0, 0.05) var sprite_diameter_scale: float = 2.2
+@export_range(1.0, 3.0, 0.05) var sprite_diameter_scale: float = 1.1
 @export_range(0.0, 12.0, 0.5) var inner_outline_width: float = 2.0
 @export_range(0.0, 16.0, 0.5) var boundary_outline_width: float = 5.0
 @export_range(0.0, 20.0, 0.5) var wall_outline_width: float = 7.0
