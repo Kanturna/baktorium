@@ -53,7 +53,7 @@ These rules are non-negotiable. A change that conflicts with them needs an ADR i
 - The only public cell placement API is `SimulationService.place_cell()`.
 - Direct mutation of `OrganismBody.cells` is forbidden outside `SimulationService`.
 - Renderer and UI must not create or mutate simulation truth.
-- Tuning parameters should live in inspector-editable `Resource` and `@export` fields, not hardcoded constants.
+- Tuning parameters live in inspector-editable `Resource` and `@export` fields. Hardcoded tuning constants in `core/`, `sim/`, `body/`, or `genetics/` are forbidden outside test fixtures.
 - External assets must be documented in `docs/DECISIONS.md`, wrapped by adapter scripts, and vendored in `addons/`.
 
 ## Validation
@@ -78,7 +78,8 @@ After every relevant repo change, check whether documentation must be updated:
 
 - `docs/STATUS.md` for the real current state
 - `docs/NEXT_STEPS.md` for the next concrete work block or open gate
-- `docs/DECISIONS.md` for new direction or architecture decisions
+- `docs/FINDINGS.md` for new bugs, review findings, debug observations, or planned corrections
+- `docs/DECISIONS.md` when a Decision Trigger below applies
 - `docs/ARCHITEKTUR.md` for changed layer rules, ownership, services, or autoloads
 - `docs/SIM_RULES.md` for changed simulation rules, cell functions, tick order, or non-goals
 
@@ -123,7 +124,7 @@ Examples:
 
 ## Completion Protocol
 
-Every implementation response should include:
+Every implementation response includes:
 
 - goal handled
 - changed file groups
