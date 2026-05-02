@@ -28,7 +28,7 @@ Every implementation response should include:
 - changed file groups
 - validation run
 - known risks or follow-ups
-- commit title and commit description suggestion
+- commit title suggestion in its own copyable block
+- commit description suggestion in a separate copyable block
 
 Do not auto-commit, push, or open PRs unless explicitly requested.
-
