@@ -12,6 +12,7 @@ func _initialize() -> void:
 	_validate_end_to_end_energy(failures)
 	_validate_docs(failures)
 	_validate_source_boundaries(failures)
+	_validate_camera_contract(failures)
 	_finish("Slice 2 integration validation", failures)
 
 
@@ -59,6 +60,15 @@ func _validate_source_boundaries(failures: Array[String]) -> void:
 		failures.append("SnapshotBuilder should not call SimulationService APIs.")
 	if snapshot_source.contains("energy_metrics.get(\"low_energy_ratio\""):
 		failures.append("SnapshotBuilder should read render thresholds from render_hints, not energy_metrics.")
+
+
+func _validate_camera_contract(failures: Array[String]) -> void:
+	var lab_source = FileAccess.get_file_as_string("res://src/lab/starter_bacterium_lab.gd")
+	if not lab_source.contains("Camera2D") or lab_source.contains("PhantomCamera"):
+		failures.append("Lab camera controls should use built-in Camera2D only.")
+	for required in ["KEY_W", "KEY_A", "KEY_S", "KEY_D", "MOUSE_BUTTON_WHEEL_UP", "KEY_C"]:
+		if not lab_source.contains(required):
+			failures.append("Lab camera controls missing %s." % required)
 
 
 func _finish(label: String, failures: Array[String]) -> void:

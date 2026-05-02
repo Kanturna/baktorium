@@ -51,6 +51,10 @@ Render thresholds such as low-energy warning ratios are render hints. They must 
 
 Slice 2 uses the lab scene as composition root for fixed ticks. This is a deliberate local driver, not a global simulation clock.
 
+## Lab Camera Contract
+
+The lab uses built-in `Camera2D` for local navigation. Camera pan and zoom are view controls only; they must not rebuild snapshots, mutate simulation state, or force renderer redraw work. HUD text stays in `CanvasLayer` so zooming the organism does not scale the UI.
+
 ## Asset Contract
 
 External plugins live in `addons/` and are connected through adapter scripts. They may improve rendering or debugging, but they do not own simulation state.

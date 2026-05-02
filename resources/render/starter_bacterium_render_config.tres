@@ -15,9 +15,8 @@ glow_strength = 0.45
 flow_enabled = false
 flow_speed = 1.25
 flow_amplitude = 2.0
-show_debug_overlay = true
+show_debug_overlay = false
 show_coordinates = true
 show_function_ids = true
 background_color = Color(0.055, 0.06, 0.075, 1)
 label_color = Color(0.92, 0.95, 1, 0.92)
-

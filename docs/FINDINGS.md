@@ -9,6 +9,7 @@ Use this file for bugs, review findings, debug notes, risks, and planned correct
 - If `src/debug/` grows beyond the current adapter/probe scope, narrow plugin-isolation validation from directory-level skips to explicit adapter-file whitelists.
 - Before Slice 5, evaluate whether the lab-driven energy tick should become a shared `TimeService` for WorldGrid and multiple organisms.
 - SimulationService grows with each sim system. Before Slice 5, reassess whether it should remain the central gateway or split into dedicated services with `SimulationService` as orchestrator.
+- Visual quality is not yet acceptable. Before growth, plan a visual calibration slice for smaller framing, richer wall-hex detail, better palette, and flowing outer membrane.
 
 ## Resolved Findings
 
@@ -29,3 +30,4 @@ Use this file for bugs, review findings, debug notes, risks, and planned correct
 - Added ADR-008 for lab-driven fixed ticks instead of an early `TimeService`.
 - Added stress-test and snapshot-boundary validation for energy.
 - Separated low-energy render hints from copied simulation energy metrics after Claude Code review.
+- Added built-in `Camera2D` lab pan/zoom/reset controls without introducing a camera plugin.

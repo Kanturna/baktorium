@@ -16,10 +16,16 @@ const ORGANISM_ID = 1
 @export var seed: int = 1
 @export var render_config: HexRenderConfig
 @export var energy_config: EnergyConfig
+@export_range(60.0, 1200.0, 10.0) var camera_pan_speed: float = 420.0
+@export_range(0.02, 0.40, 0.01) var camera_zoom_step: float = 0.12
+@export_range(0.20, 1.00, 0.01) var camera_min_zoom: float = 0.45
+@export_range(1.00, 4.00, 0.05) var camera_max_zoom: float = 2.25
+@export_range(0.20, 2.00, 0.01) var camera_default_zoom: float = 0.72
 
 var service: SimulationService
 var catalog: CellFunctionCatalog
 var renderer: HexOrganismRenderer
+var lab_camera: Camera2D
 var info_label: Label
 var perf_probe = PerfProbe.new()
 var energy_accumulator: float = 0.0
@@ -42,17 +48,14 @@ func _ready() -> void:
 	renderer.set_render_config(render_config)
 	add_child(renderer)
 
-	var camera = Camera2D.new()
-	camera.name = "Camera2D"
-	camera.enabled = true
-	camera.position = get_viewport_rect().size * 0.5
-	add_child(camera)
+	_create_camera()
 
 	_create_ui()
 	_rebuild()
 
 
 func _process(delta: float) -> void:
+	_process_camera(delta)
 	if service == null or catalog == null or energy_config == null:
 		return
 	energy_accumulator += delta
@@ -68,11 +71,41 @@ func _process(delta: float) -> void:
 		_refresh_snapshot()
 
 
+func _process_camera(delta: float) -> void:
+	if lab_camera == null:
+		return
+	var axis = Vector2.ZERO
+	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
+		axis.x -= 1.0
+	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
+		axis.x += 1.0
+	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP):
+		axis.y -= 1.0
+	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN):
+		axis.y += 1.0
+	if axis == Vector2.ZERO:
+		return
+	var zoom_factor = maxf(0.05, lab_camera.zoom.x)
+	lab_camera.position += axis.normalized() * camera_pan_speed * delta / zoom_factor
+
+
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed:
+		match event.button_index:
+			MOUSE_BUTTON_WHEEL_UP:
+				_adjust_camera_zoom(1.0)
+				get_viewport().set_input_as_handled()
+			MOUSE_BUTTON_WHEEL_DOWN:
+				_adjust_camera_zoom(-1.0)
+				get_viewport().set_input_as_handled()
+		return
+
 	if not (event is InputEventKey) or not event.pressed or event.echo:
 		return
 
 	match event.keycode:
+		KEY_C:
+			reset_camera_view()
 		KEY_N:
 			seed += 1
 			_rebuild()
@@ -82,7 +115,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		KEY_R:
 			seed = int(Time.get_unix_time_from_system()) % 100000
 			_rebuild()
-		KEY_D:
+		KEY_G:
 			render_config.show_debug_overlay = not render_config.show_debug_overlay
 			renderer.queue_redraw()
 			_update_label()
@@ -92,6 +125,38 @@ func _unhandled_input(event: InputEvent) -> void:
 			_update_label()
 		KEY_F3:
 			DebugMenuAdapter.toggle(self)
+
+
+func _create_camera() -> void:
+	lab_camera = Camera2D.new()
+	lab_camera.name = "LabCamera2D"
+	lab_camera.enabled = true
+	lab_camera.position_smoothing_enabled = true
+	lab_camera.position_smoothing_speed = 9.0
+	add_child(lab_camera)
+	reset_camera_view()
+	lab_camera.make_current()
+
+
+func reset_camera_view() -> void:
+	if lab_camera == null:
+		return
+	lab_camera.position = _default_camera_position()
+	var default_zoom = clampf(camera_default_zoom, camera_min_zoom, camera_max_zoom)
+	lab_camera.zoom = Vector2.ONE * default_zoom
+	lab_camera.reset_smoothing()
+
+
+func _adjust_camera_zoom(direction: float) -> void:
+	if lab_camera == null:
+		return
+	var zoom_factor = 1.0 + camera_zoom_step * direction
+	var next_zoom = clampf(lab_camera.zoom.x * zoom_factor, camera_min_zoom, camera_max_zoom)
+	lab_camera.zoom = Vector2.ONE * next_zoom
+
+
+func _default_camera_position() -> Vector2:
+	return get_viewport_rect().size * 0.5
 
 
 func _create_ui() -> void:
@@ -139,7 +204,7 @@ func _update_label() -> void:
 	var max_energy = float(energy_metrics.get("max_energy", 0.0))
 	var energy_ratio = float(energy_metrics.get("energy_ratio", 0.0))
 	var low_marker = " LOW" if max_energy > 0.0 and energy_ratio <= energy_config.low_energy_ratio else ""
-	info_label.text = "Baktorium Slice 2\nSeed: %d\nCells: %d\nEnergy: %.1f/%.1f%s\nProd: %.1f  Maint: %.1f  Net: %.1f  Tick: %d\nBody: %dus Energy: %dus Snapshot: %dus\nD Debug  F Flow:%s  N/B/R Seed  F3 DebugMenu" % [
+	info_label.text = "Baktorium Slice 2\nSeed: %d\nCells: %d\nEnergy: %.1f/%.1f%s\nProd: %.1f  Maint: %.1f  Net: %.1f  Tick: %d\nBody: %dus Energy: %dus Snapshot: %dus\nG Debug  F Flow:%s  N/B/R Seed  F3 Menu\nWASD/Arrows Pan  Wheel Zoom  C Camera" % [
 		seed,
 		perf_probe.cell_count,
 		current_energy,

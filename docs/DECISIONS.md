@@ -80,3 +80,17 @@ Decision: Slice 2 uses the lab scene's `_process(delta)` as the composition-root
 Reason: Slice 2 has one visible organism and no global world clock. A `TimeService` autoload would add global state and test mocking overhead before multiple organisms or a world grid exist.
 
 Re-evaluation trigger: before Slice 5, reassess whether WorldGrid or multiple organisms require a shared `TimeService`.
+
+## ADR-009: Lab Camera Uses Built-In Camera2D
+
+Decision: Slice 2 lab navigation uses Godot's built-in `Camera2D`, not an external camera plugin.
+
+Reason: The lab currently needs only pan, zoom, reset, smoothing, and HUD separation. Built-in `Camera2D` covers this without adding a plugin, adapter, autoload, or asset-maintenance burden.
+
+Implementation:
+
+- `W/A/S/D` and arrow keys pan the camera.
+- Mouse wheel zooms.
+- `C` resets camera position and zoom.
+- `G` toggles debug overlay because `D` is reserved for camera pan.
+- HUD remains in `CanvasLayer` so camera zoom does not scale the HUD text.

@@ -1,7 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://dbke7vdra2t0r"]
+[gd_scene format=3 uid="uid://dbke7vdra2t0r"]
 
-[ext_resource type="Script" path="res://src/lab/starter_bacterium_lab.gd" id="1"]
+[ext_resource type="Script" uid="uid://cpof5xegf8o1u" path="res://src/lab/starter_bacterium_lab.gd" id="1"]
 
-[node name="StarterBacteriumLab" type="Node2D"]
+[node name="StarterBacteriumLab" type="Node2D" unique_id=750660562]
 script = ExtResource("1")
-
