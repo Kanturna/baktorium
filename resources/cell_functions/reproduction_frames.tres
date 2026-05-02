@@ -1,46 +1,46 @@
 [gd_resource type="SpriteFrames" load_steps=12 format=3]
 
-[ext_resource type="Texture2D" path="res://assets/textures/cell_functions/reproduction_frames.png" id="1_repro_frames"]
+[ext_resource type="Texture2D" path="res://assets/textures/cell_functions/reproduction_frames.png" id="1_reproduction_frames"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_0"]
-atlas = ExtResource("1_repro_frames")
-region = Rect2(0, 0, 383, 410)
+atlas = ExtResource("1_reproduction_frames")
+region = Rect2(0, 0, 306, 362)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_1"]
-atlas = ExtResource("1_repro_frames")
-region = Rect2(383, 0, 383, 410)
+atlas = ExtResource("1_reproduction_frames")
+region = Rect2(306, 0, 306, 362)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_2"]
-atlas = ExtResource("1_repro_frames")
-region = Rect2(766, 0, 383, 410)
+atlas = ExtResource("1_reproduction_frames")
+region = Rect2(612, 0, 306, 362)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_3"]
-atlas = ExtResource("1_repro_frames")
-region = Rect2(1149, 0, 383, 410)
+atlas = ExtResource("1_reproduction_frames")
+region = Rect2(918, 0, 306, 362)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_4"]
-atlas = ExtResource("1_repro_frames")
-region = Rect2(1532, 0, 383, 410)
+atlas = ExtResource("1_reproduction_frames")
+region = Rect2(1224, 0, 306, 362)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_5"]
-atlas = ExtResource("1_repro_frames")
-region = Rect2(0, 410, 383, 410)
+atlas = ExtResource("1_reproduction_frames")
+region = Rect2(0, 362, 306, 362)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_6"]
-atlas = ExtResource("1_repro_frames")
-region = Rect2(383, 410, 383, 410)
+atlas = ExtResource("1_reproduction_frames")
+region = Rect2(306, 362, 306, 362)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_7"]
-atlas = ExtResource("1_repro_frames")
-region = Rect2(766, 410, 383, 410)
+atlas = ExtResource("1_reproduction_frames")
+region = Rect2(612, 362, 306, 362)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_8"]
-atlas = ExtResource("1_repro_frames")
-region = Rect2(1149, 410, 383, 410)
+atlas = ExtResource("1_reproduction_frames")
+region = Rect2(918, 362, 306, 362)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_9"]
-atlas = ExtResource("1_repro_frames")
-region = Rect2(1532, 410, 383, 410)
+atlas = ExtResource("1_reproduction_frames")
+region = Rect2(1224, 362, 306, 362)
 
 [resource]
 animations = [{
@@ -78,5 +78,5 @@ animations = [{
 ],
 "loop": true,
 "name": &"default",
-"speed": 8.0
+"speed": 1.0
 }]

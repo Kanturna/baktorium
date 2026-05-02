@@ -16,6 +16,7 @@ boundary_alpha = 0.9
 glow_strength = 0.45
 flow_enabled = false
 boundary_glow_enabled = false
+ambient_particles_enabled = false
 flow_speed = 1.25
 flow_amplitude = 2.0
 show_debug_overlay = false

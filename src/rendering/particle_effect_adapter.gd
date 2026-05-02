@@ -20,7 +20,8 @@ static func setup_world_ambient(parent: Node) -> GPUParticles2D:
 	particles.position = Vector2.ZERO
 	particles.visibility_rect = Rect2(Vector2(-1200, -900), Vector2(2400, 1800))
 	particles.z_index = 1
-	particles.emitting = true
+	particles.visible = false
+	particles.emitting = false
 
 	var material = ParticleProcessMaterial.new()
 	material.direction = Vector3(0.0, -1.0, 0.0)

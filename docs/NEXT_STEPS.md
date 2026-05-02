@@ -2,23 +2,30 @@
 
 ## Immediate Gate
 
-Validate Slice 2 Polish Iter A:
+Validate Slice 2 Polish Iter B0:
 
 ```powershell
+D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tools/normalize_cell_spritesheets.gd
 D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_polish_a1_assets_validation.gd
 D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_polish_a2_renderer_validation.gd
 D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_polish_a3_environment_validation.gd
 D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_polish_iter_a_validation.gd
+D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_slice_2_camera_validation.gd
 D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_slice_2_validation.gd
 ```
 
 Then open the lab scene in Godot and check:
 
 - Beauty mode starts by default.
+- Cell sprites no longer show checkerboard or opaque rectangular backgrounds.
+- Energy Core and Photosynthesis animations do not visibly jitter left/right, up/down, or grow/shrink.
+- Energy Core and Photosynthesis animation speed feels slow and subtle rather than busy.
+- Reproduction and Wall cells stay visually static unless animation is deliberately re-enabled later.
 - The seven-cell starter bacterium is visible with detailed sprites and no visual cell gaps.
 - Energy Core, Photosynthesis, Reproduction, and Wall cells are clearly distinguishable.
 - Energy Core and Photosynthesis animations feel subtle rather than noisy.
 - Wall boundary cells use the outer wall visual style.
+- Ambient particle bubbles are not visible by default.
 - `G` toggles Beauty/Debug mode.
 - Debug mode shows hard hex polygons, coordinates, and function ids.
 - Beauty mode hides debug text and keeps sprites visible.
@@ -41,5 +48,5 @@ Do not start growth until the Beauty-mode baseline has been reviewed. Before 250
 ## Commit Suggestion
 
 ```text
-feat(rendering): add sprite-based beauty mode
+fix(rendering): normalize cell animation frames
 ```

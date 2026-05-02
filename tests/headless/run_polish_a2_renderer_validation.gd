@@ -92,6 +92,8 @@ func _validate_render_config(failures: Array[String]) -> void:
 		failures.append("Render mode should default to beauty.")
 	if config.boundary_glow_enabled:
 		failures.append("Boundary glow should default to false.")
+	if config.ambient_particles_enabled:
+		failures.append("Ambient particles should default to false after Iter B0 visual fix.")
 	if config.show_debug_overlay:
 		failures.append("Debug overlay should default off in beauty mode.")
 	if config.sprite_diameter_scale != 1.1:
@@ -114,15 +116,21 @@ func _validate_sprite_scale(failures: Array[String]) -> void:
 func _validate_animation_speed(failures: Array[String]) -> void:
 	var renderer = HexOrganismRenderer.new()
 	for item in [
-		[0.0, 0.5],
-		[0.5, 1.0],
-		[1.0, 1.5],
+		[0.0, 1.0],
+		[0.5, 2.0],
+		[1.0, 3.0],
 	]:
 		var speed = renderer._calculate_animation_speed({
 			"animation_modulator": item[0],
+			"animation_base_fps": 2.0,
 			"animation_modulation_strength": 0.5,
 		})
 		_expect_close(speed, item[1], "animation speed", failures)
+	var static_speed = renderer._calculate_animation_speed({
+		"animation_base_fps": 0.0,
+		"animation_modulation_strength": 1.0,
+	})
+	_expect_close(static_speed, 0.0, "static animation speed", failures)
 	renderer.free()
 
 

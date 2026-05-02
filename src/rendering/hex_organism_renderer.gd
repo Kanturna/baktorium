@@ -189,8 +189,12 @@ func _configure_sprite_node(node: Node2D, cell_data: Dictionary) -> void:
 		var animated = node as AnimatedSprite2D
 		animated.sprite_frames = cell_data.get("sprite_frames", null)
 		animated.animation = &"default"
-		animated.speed_scale = _calculate_animation_speed(cell_data)
-		if not animated.is_playing():
+		var animation_speed = _calculate_animation_speed(cell_data)
+		animated.speed_scale = animation_speed
+		if animation_speed <= 0.01:
+			animated.stop()
+			animated.frame = 0
+		elif not animated.is_playing():
 			animated.play("default")
 	elif node is Sprite2D:
 		var sprite = node as Sprite2D
@@ -222,9 +226,13 @@ func _selected_texture(cell_data: Dictionary):
 
 
 func _calculate_animation_speed(cell_data: Dictionary) -> float:
+	var base_fps = maxf(float(cell_data.get("animation_base_fps", 0.0)), 0.0)
+	if base_fps <= 0.0:
+		return 0.0
 	var modulator = clampf(float(cell_data.get("animation_modulator", 0.5)), 0.0, 1.0)
 	var strength = clampf(float(cell_data.get("animation_modulation_strength", 0.0)), 0.0, 1.0)
-	return clampf(1.0 + strength * (modulator - 0.5) * 2.0, 0.25, 2.0)
+	var multiplier = clampf(1.0 + strength * (modulator - 0.5) * 2.0, 0.25, 2.0)
+	return base_fps * multiplier
 
 
 func _calculate_sprite_modulate(cell_data: Dictionary) -> Color:

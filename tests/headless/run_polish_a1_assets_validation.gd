@@ -3,10 +3,36 @@ extends SceneTree
 const CellFunctionCatalog = preload("res://src/sim/catalog/cell_function_catalog.gd")
 const HexRenderConfig = preload("res://src/rendering/hex_render_config.gd")
 
+const COLS := 5
+const ROWS := 2
+const FRAME_COUNT := COLS * ROWS
+const ALPHA_THRESHOLD := 0.003
+const DRIFT_GATE_PX := 1.0
+const SIZE_DRIFT_GATE_PX := 1.0
+
+const ACTIVE_TEXTURES := [
+	"res://assets/textures/cell_functions/energy_core.png",
+	"res://assets/textures/cell_functions/photosynthesis.png",
+	"res://assets/textures/cell_functions/reproduction.png",
+	"res://assets/textures/cell_functions/wall_outer.png",
+	"res://assets/textures/cell_functions/wall_inner.png",
+]
+
+const ACTIVE_FRAME_SHEETS := [
+	"res://assets/textures/cell_functions/energy_core_frames.png",
+	"res://assets/textures/cell_functions/photosynthesis_frames.png",
+	"res://assets/textures/cell_functions/reproduction_frames.png",
+	"res://assets/textures/cell_functions/wall_outer_frames.png",
+	"res://assets/textures/cell_functions/wall_inner_frames.png",
+]
+
 
 func _initialize() -> void:
 	var failures: Array[String] = []
 	_validate_assets_exist(failures)
+	_validate_transparent_derived_assets(failures)
+	_validate_frame_center_drift(failures)
+	_validate_mipmaps(failures)
 	_validate_sprite_frames(failures)
 	_validate_sprite_diameter_sanity(failures)
 	_validate_catalog_visual_schema(failures)
@@ -32,6 +58,99 @@ func _validate_assets_exist(failures: Array[String]) -> void:
 	]:
 		if not FileAccess.file_exists(path):
 			failures.append("Missing asset %s." % path)
+
+
+func _validate_transparent_derived_assets(failures: Array[String]) -> void:
+	for path in ACTIVE_TEXTURES + ACTIVE_FRAME_SHEETS:
+		var image = Image.new()
+		if image.load(ProjectSettings.globalize_path(path)) != OK:
+			failures.append("Could not load derived texture for alpha validation: %s." % path)
+			continue
+		var corners = [
+			Vector2i(0, 0),
+			Vector2i(image.get_width() - 1, 0),
+			Vector2i(0, image.get_height() - 1),
+			Vector2i(image.get_width() - 1, image.get_height() - 1),
+		]
+		for corner in corners:
+			if image.get_pixel(corner.x, corner.y).a > ALPHA_THRESHOLD:
+				failures.append("Derived texture corner should be transparent: %s at %s." % [path, str(corner)])
+
+
+func _validate_frame_center_drift(failures: Array[String]) -> void:
+	for path in ACTIVE_FRAME_SHEETS:
+		var image = Image.new()
+		if image.load(ProjectSettings.globalize_path(path)) != OK:
+			failures.append("Could not load frame sheet for drift validation: %s." % path)
+			continue
+		if image.get_width() % COLS != 0 or image.get_height() % ROWS != 0:
+			failures.append("Normalized sheet should divide exactly into 5x2 frames: %s." % path)
+			continue
+		var tile = Vector2i(image.get_width() / COLS, image.get_height() / ROWS)
+		var centers: Array[Vector2] = []
+		var sizes: Array[Vector2] = []
+		for frame_index in FRAME_COUNT:
+			var col = frame_index % COLS
+			var row = frame_index / COLS
+			var bounds = _alpha_bounds(image, Vector2i(col * tile.x, row * tile.y), tile)
+			if bounds.is_empty():
+				failures.append("Frame %d has no visible alpha in %s." % [frame_index, path])
+				continue
+			centers.append(bounds["center"])
+			sizes.append(bounds["size"])
+		if centers.size() != FRAME_COUNT:
+			continue
+		var drift = _center_drift(centers)
+		if drift > DRIFT_GATE_PX:
+			failures.append("Frame center drift %.2f px exceeds %.2f px in %s." % [drift, DRIFT_GATE_PX, path])
+		var size_drift = _center_drift(sizes)
+		if size_drift > SIZE_DRIFT_GATE_PX:
+			failures.append("Frame visible-size drift %.2f px exceeds %.2f px in %s." % [size_drift, SIZE_DRIFT_GATE_PX, path])
+
+
+func _alpha_bounds(image: Image, origin: Vector2i, size: Vector2i) -> Dictionary:
+	var min_x = size.x
+	var min_y = size.y
+	var max_x = -1
+	var max_y = -1
+	for y in size.y:
+		for x in size.x:
+			if image.get_pixel(origin.x + x, origin.y + y).a <= ALPHA_THRESHOLD:
+				continue
+			min_x = mini(min_x, x)
+			min_y = mini(min_y, y)
+			max_x = maxi(max_x, x)
+			max_y = maxi(max_y, y)
+	if max_x < min_x or max_y < min_y:
+		return {}
+	return {
+		"center": Vector2((min_x + max_x) * 0.5, (min_y + max_y) * 0.5),
+		"size": Vector2(max_x - min_x + 1, max_y - min_y + 1),
+	}
+
+
+func _center_drift(centers: Array[Vector2]) -> float:
+	var min_x = centers[0].x
+	var max_x = centers[0].x
+	var min_y = centers[0].y
+	var max_y = centers[0].y
+	for center in centers:
+		min_x = minf(min_x, center.x)
+		max_x = maxf(max_x, center.x)
+		min_y = minf(min_y, center.y)
+		max_y = maxf(max_y, center.y)
+	return maxf(max_x - min_x, max_y - min_y)
+
+
+func _validate_mipmaps(failures: Array[String]) -> void:
+	for path in ACTIVE_TEXTURES + ACTIVE_FRAME_SHEETS:
+		var import_path = "%s.import" % path
+		if not FileAccess.file_exists(import_path):
+			failures.append("Missing import settings for %s." % path)
+			continue
+		var source = FileAccess.get_file_as_string(import_path)
+		if not source.contains("mipmaps/generate=true"):
+			failures.append("Mipmaps should stay enabled for zoomable cell texture: %s." % path)
 
 
 func _validate_sprite_frames(failures: Array[String]) -> void:

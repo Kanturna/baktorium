@@ -49,10 +49,16 @@ func _validate_docs(failures: Array[String]) -> void:
 			failures.append("DECISIONS.md missing %s." % required)
 	if not status.contains("Slice 2 Polish Iter A"):
 		failures.append("STATUS.md missing Polish Iter A status.")
+	if not status.contains("Slice 2 Polish Iter B0"):
+		failures.append("STATUS.md missing Polish Iter B0 status.")
 	if not next_steps.contains("Beauty/Debug") or not next_steps.contains("100-cell"):
 		failures.append("NEXT_STEPS.md missing Beauty/Debug or 100-cell manual gates.")
+	if not next_steps.contains("checkerboard") or not decisions.contains("normalize_cell_spritesheets"):
+		failures.append("Docs should include Iter B0 normalization and checkerboard gates.")
 	if not findings.contains("Hex-radius") or not findings.contains("Particle adapter"):
 		failures.append("FINDINGS.md missing Iter-A future findings.")
+	if not findings.contains("Slice 2 Polish Iter B0"):
+		failures.append("FINDINGS.md missing Iter B0 resolved findings.")
 
 
 func _validate_png_cleanup_gate(failures: Array[String]) -> void:

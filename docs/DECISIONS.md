@@ -145,6 +145,9 @@ Schema:
 
 Rules:
 
+- `png/` is source material until visual sign-off; `assets/textures/cell_functions/` contains derived runtime textures.
+- Active 5x2 sheets are normalized through `tools/normalize_cell_spritesheets.gd` before runtime use.
+- The normalizer centers each frame by alpha bounds, normalizes visible alpha footprint per sheet, writes transparent derived sheets, emits frame-0 static fallbacks, and keeps atlas regions integer.
 - SpriteFrames are built from measured 5x2 sheet dimensions; the implementation must not assume 1024 px or exact divisibility by 5.
 - SpriteFrame atlas regions use integer pixel rectangles to avoid sub-pixel sampling jitter between animation frames.
 - Mipmaps are required for cell textures because the lab camera supports mouse-wheel zoom.
@@ -154,6 +157,8 @@ Rules:
 - `hex_radius` remains `42.0` until the Beauty-mode sign-off explicitly changes visual scale.
 - `sprite_diameter_scale` defaults to `1.1`, giving a small glow overlap without covering neighboring cells.
 - Ambient particles are parented to the organism renderer so they appear around the bacterium center rather than the lab origin.
+- Ambient particles default to disabled after Iter B0; they require explicit render-config reactivation.
+- Generated SpriteFrames use animation speed `1.0`; `CellFunctionDef.animation_base_fps` is the effective per-cell animation speed in the renderer. `0.0` means the Beauty sprite uses frame 0 as a static visual.
 
 Provenance: cell sprites and animation sheets were provided by the user from their ChatGPT/OpenAI workflow. Non-selected variants stay in `_alternates/` until the visual direction is signed off.
 

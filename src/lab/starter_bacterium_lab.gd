@@ -242,7 +242,7 @@ func _apply_render_mode() -> void:
 	render_config.show_coordinates = is_debug
 	render_config.show_function_ids = is_debug
 	WorldEnvironmentAdapter.set_glow_enabled(world_environment, not is_debug)
-	ParticleEffectAdapter.set_enabled(ambient_particles, not is_debug)
+	ParticleEffectAdapter.set_enabled(ambient_particles, render_config.ambient_particles_enabled and not is_debug)
 	if renderer != null:
 		renderer.set_render_config(render_config)
 

@@ -25,5 +25,5 @@ outer_sprite_texture = ExtResource("2_wall_outer_texture")
 inner_sprite_texture = ExtResource("3_wall_inner_texture")
 outer_sprite_frames = ExtResource("4_wall_outer_frames")
 inner_sprite_frames = ExtResource("5_wall_inner_frames")
-animation_base_fps = 8.0
-animation_modulation_strength = 0.25
+animation_base_fps = 0.0
+animation_modulation_strength = 0.0

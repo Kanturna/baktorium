@@ -13,6 +13,7 @@ extends Resource
 @export_range(0.0, 1.0, 0.01) var glow_strength: float = 0.45
 @export var flow_enabled: bool = false
 @export var boundary_glow_enabled: bool = false
+@export var ambient_particles_enabled: bool = false
 @export_range(0.0, 8.0, 0.05) var flow_speed: float = 1.25
 @export_range(0.0, 8.0, 0.05) var flow_amplitude: float = 2.0
 @export var show_debug_overlay: bool = true

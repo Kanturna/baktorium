@@ -21,5 +21,5 @@ boundary_outline_scale = 1.0
 visual_weight = 1.0
 outer_sprite_texture = ExtResource("2_photosynthesis_texture")
 outer_sprite_frames = ExtResource("3_photosynthesis_frames")
-animation_base_fps = 8.0
-animation_modulation_strength = 0.5
+animation_base_fps = 2.0
+animation_modulation_strength = 0.2

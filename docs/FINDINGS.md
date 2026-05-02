@@ -13,6 +13,7 @@ Use this file for bugs, review findings, debug notes, risks, and planned correct
 - Hex-radius remains at `42.0` for Slice 2 Polish Iter A. Re-evaluate Hex-radius as a visual tuning option after Beauty-mode sign-off.
 - Particle adapter currently owns only ambient world drift. Extend it in Slice 3 for cell event bursts and Slice 4 for organism aura only when those effects become real slice requirements.
 - Before 250+ cells, evaluate whether the Beauty renderer should move from pooled `Sprite2D`/`AnimatedSprite2D` nodes to TextureAtlas, MultiMesh, or another batched path.
+- Iter B0 normalized active sprite sheets, but final tile heights still differ by more than 5% between functions (`344..390` px). During manual Beauty sign-off, check whether cross-function sprite sizing feels coherent; if not, plan Iter B1 for cross-function anchor/scale normalization.
 
 ## Resolved Findings
 
@@ -41,3 +42,11 @@ Use this file for bugs, review findings, debug notes, risks, and planned correct
 - Re-parented ambient particles to the organism renderer so they spawn around the bacterium center.
 - Regenerated SpriteFrame atlas regions as integer pixel rectangles to avoid animation sub-pixel jitter.
 - Added validation for sprite diameter sanity, integer atlas regions, and particle anchoring.
+
+### 2026-05-02 - Slice 2 Polish Iter B0
+
+- Regenerated active cell-function textures from the transparent `png/` source sheets into derived runtime assets under `assets/textures/cell_functions/`.
+- Added `tools/normalize_cell_spritesheets.gd` to center animation frames by alpha bounds, normalize visible frame footprint, and generate static frame-0 fallbacks.
+- Added asset validation for transparent corners, mipmaps, integer regions, `<= 1 px` frame-center drift, and `<= 1 px` visible-size drift.
+- Disabled ambient particles by default while keeping the renderer-relative adapter path available for later explicit effects.
+- Slowed core/photosynthesis animation to subtle low-FPS playback and made reproduction/wall static by default.

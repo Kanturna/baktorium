@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cpjg1hqdd5pph"
-path="res://.godot/imported/inner_outer_wall_membrane.png-58f275aa6241413a8b32b47feebd5c82.ctex"
+uid="uid://dac3p0qnu1c4n"
+path="res://.godot/imported/inner_outer_wall_membrane frames 10.png-2ad4dd14a8120d8eeb92bd0bd33fca41.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://png/inner_outer_wall_membrane/inner_outer_wall_membrane.png"
-dest_files=["res://.godot/imported/inner_outer_wall_membrane.png-58f275aa6241413a8b32b47feebd5c82.ctex"]
+source_file="res://png/inner_outer_wall_membrane/inner_outer_wall_membrane frames 10.png"
+dest_files=["res://.godot/imported/inner_outer_wall_membrane frames 10.png-2ad4dd14a8120d8eeb92bd0bd33fca41.ctex"]
 
 [params]
 

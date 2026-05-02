@@ -1,6 +1,7 @@
 extends SceneTree
 
 const ParticleEffectAdapter = preload("res://src/rendering/particle_effect_adapter.gd")
+const HexRenderConfig = preload("res://src/rendering/hex_render_config.gd")
 const SimulationService = preload("res://src/sim/simulation_service.gd")
 const StarterBacteriumLab = preload("res://src/lab/starter_bacterium_lab.gd")
 const WorldEnvironmentAdapter = preload("res://src/rendering/world_environment_adapter.gd")
@@ -46,14 +47,16 @@ func _validate_particles(failures: Array[String]) -> void:
 	if not (particles is GPUParticles2D):
 		failures.append("ParticleEffectAdapter should create GPUParticles2D.")
 		return
+	if particles.visible or particles.emitting:
+		failures.append("Ambient particles should be created disabled by default.")
 	if particles.amount < 30 or particles.amount > 50:
 		failures.append("Ambient particles should stay in the planned 30-50 range.")
-	ParticleEffectAdapter.set_enabled(particles, false)
-	if particles.visible or particles.emitting:
-		failures.append("ParticleEffectAdapter should disable ambient particles.")
 	ParticleEffectAdapter.set_enabled(particles, true)
 	if not particles.visible or not particles.emitting:
 		failures.append("ParticleEffectAdapter should enable ambient particles.")
+	ParticleEffectAdapter.set_enabled(particles, false)
+	if particles.visible or particles.emitting:
+		failures.append("ParticleEffectAdapter should disable ambient particles.")
 	parent.free()
 
 
@@ -64,8 +67,15 @@ func _validate_lab_stress_hook(failures: Array[String]) -> void:
 			failures.append("Lab stress hook missing %s." % required)
 	if not source.contains("ParticleEffectAdapter.setup_world_ambient(renderer)"):
 		failures.append("Ambient particles should be parented to the renderer, not the lab root.")
+	if not source.contains("render_config.ambient_particles_enabled and not is_debug"):
+		failures.append("Lab should keep ambient particles disabled unless render config explicitly enables them.")
 	if source.contains("lab_camera_adapter") or source.contains("PhantomCamera"):
 		failures.append("Iter A should not introduce a camera adapter or PhantomCamera.")
+	var config = load("res://resources/render/starter_bacterium_render_config.tres") as HexRenderConfig
+	if config == null:
+		failures.append("Starter render config failed to load for ambient-particle default validation.")
+	elif config.ambient_particles_enabled:
+		failures.append("Starter render config should keep ambient particles disabled by default.")
 
 
 func _validate_lab_stress_body_build(failures: Array[String]) -> void:
