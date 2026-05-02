@@ -43,6 +43,18 @@ The first renderer uses `Node2D._draw()` plus optional adapter-based antialiased
 
 Visual differences between cell functions are driven by render metadata copied into the snapshot. Renderers may branch on accent recipe names, not on simulation function ids.
 
+## Visual Truth Contract
+
+Simulation Truth vs Visual Truth is formalized in ADR-010.
+
+- Simulation truth is axial coordinates, function ids, bodies, energy state, and placement authority.
+- Visual truth is sprites, SpriteFrames, animation, glow, particles, tint, and mode-specific presentation.
+- Runtime snapshots are the only bridge from simulation data to rendering recipes.
+- Beauty mode may hide hard hex polygons behind organic sprites.
+- Debug mode must keep hard polygon geometry, coordinates, and function ids available.
+- Visual fields on `CellFunctionDef` are render-only. Sim systems do not read these visual fields.
+- Wall visual selection may use boundary status from the snapshot to choose outer or inner wall sprites, but that selection is not new simulation state.
+
 ## Energy Contract
 
 Energy state is simulation truth and stays behind `SimulationService`. Runtime snapshots may carry copied energy metrics and derived per-cell render fields, but rendering and scenes must not hold mutable `OrganismEnergyState` references.

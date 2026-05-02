@@ -55,6 +55,8 @@ Slice 1 cell-function resources also carry visual metadata:
 - `boundary_outline_scale` controls boundary emphasis without renderer hard-coding.
 - `requires_surface` marks functions that should live on organism surfaces once growth rules exist.
 - `energy_capacity` controls organism-level storage capacity.
+- Slice 2 Polish Iter A adds render-only sprite fields for Beauty mode: `outer_sprite_texture`, `inner_sprite_texture`, `outer_sprite_frames`, `inner_sprite_frames`, `animation_base_fps`, and `animation_modulation_strength`.
+- These visual fields are not simulation rules. Sim systems do not read these visual fields.
 
 ## Genome Schema
 

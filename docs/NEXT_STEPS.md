@@ -2,50 +2,44 @@
 
 ## Immediate Gate
 
-Validate Slice 2.4:
+Validate Slice 2 Polish Iter A:
 
 ```powershell
-D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_slice_2_camera_validation.gd
+D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_polish_a1_assets_validation.gd
+D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_polish_a2_renderer_validation.gd
+D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_polish_a3_environment_validation.gd
+D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_polish_iter_a_validation.gd
 D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_slice_2_validation.gd
 ```
 
 Then open the lab scene in Godot and check:
 
-- the seven-cell starter bacterium is visible,
-- all four function types are visually distinct,
-- energy rises toward the maximum,
-- the energy core and photosynthesis cells show subtle energy feedback,
-- debug overlay toggles with `G`,
-- flow toggles with `F`,
-- Debug Menu toggles with `F3`,
-- `WASD` (`W/A/S/D`) or arrow keys pan the camera,
-- `Mouse wheel` zooms without making HUD text blurry,
-- `C` resets camera position and zoom,
-- seed reset/rebuild with `N`, `B`, and `R` keeps the body at seven cells,
-- no logical cell gaps are visible.
+- Beauty mode starts by default.
+- The seven-cell starter bacterium is visible with detailed sprites and no visual cell gaps.
+- Energy Core, Photosynthesis, Reproduction, and Wall cells are clearly distinguishable.
+- Energy Core and Photosynthesis animations feel subtle rather than noisy.
+- Wall boundary cells use the outer wall visual style.
+- `G` toggles Beauty/Debug mode.
+- Debug mode shows hard hex polygons, coordinates, and function ids.
+- Beauty mode hides debug text and keeps sprites visible.
+- `F` still toggles flow.
+- `F3` still toggles Debug Menu.
+- `WASD` (`W/A/S/D`) or arrow keys pan the camera.
+- `Mouse wheel` zooms without making cell sprites visibly pixelated.
+- `C` resets camera position and zoom.
+- Seed reset/rebuild with `N`, `B`, and `R` keeps the starter body at seven cells.
+- Enable `use_stress_body` in the lab Inspector and confirm the 100-cell Beauty-mode stress body runs at 60 FPS for 10 seconds with no frame spikes above 33.3 ms.
 
-## After Slice 2
+## Cleanup Gate
 
-Do not start growth until Slice 2 energy behavior and visual feedback have been reviewed.
+Do not delete `png/` until the Beauty/Debug visual check and the 100-cell performance gate are signed off. After sign-off, remove `png/` and rerun `run_polish_iter_a_validation.gd` with the cleanup expectation updated.
 
-Before growth, plan a visual calibration slice for the hybrid wall-hex plus flowing outer membrane style.
+## After Polish Iter A
 
-## Slice 2 Commit Suggestions
+Do not start growth until the Beauty-mode baseline has been reviewed. Before 250+ cells, evaluate whether Sprite2D/AnimatedSprite2D pooling should move to TextureAtlas, MultiMesh, or another batched rendering approach.
 
-2A:
-
-```text
-feat(sim): add organism energy tick
-```
-
-2B:
+## Commit Suggestion
 
 ```text
-feat(runtime): expose energy feedback in lab
-```
-
-2.4:
-
-```text
-feat(lab): add camera navigation
+feat(rendering): add sprite-based beauty mode
 ```

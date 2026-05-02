@@ -1,6 +1,10 @@
-[gd_resource type="Resource" script_class="CellFunctionDef" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="CellFunctionDef" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://src/sim/catalog/cell_function_def.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/textures/cell_functions/wall_outer.png" id="2_wall_outer_texture"]
+[ext_resource type="Texture2D" path="res://assets/textures/cell_functions/wall_inner.png" id="3_wall_inner_texture"]
+[ext_resource type="SpriteFrames" path="res://resources/cell_functions/wall_outer_frames.tres" id="4_wall_outer_frames"]
+[ext_resource type="SpriteFrames" path="res://resources/cell_functions/wall_inner_frames.tres" id="5_wall_inner_frames"]
 
 [resource]
 script = ExtResource("1")
@@ -17,3 +21,9 @@ protection_value = 0.0
 requires_surface = true
 boundary_outline_scale = 1.4
 visual_weight = 1.0
+outer_sprite_texture = ExtResource("2_wall_outer_texture")
+inner_sprite_texture = ExtResource("3_wall_inner_texture")
+outer_sprite_frames = ExtResource("4_wall_outer_frames")
+inner_sprite_frames = ExtResource("5_wall_inner_frames")
+animation_base_fps = 8.0
+animation_modulation_strength = 0.25

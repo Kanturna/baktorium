@@ -6,6 +6,8 @@
 script = ExtResource("1")
 hex_radius = 42.0
 pointy_top = true
+render_mode = "beauty"
+sprite_diameter_scale = 2.2
 inner_outline_width = 2.0
 boundary_outline_width = 5.0
 wall_outline_width = 7.0
@@ -13,6 +15,7 @@ cell_fill_alpha = 0.94
 boundary_alpha = 0.9
 glow_strength = 0.45
 flow_enabled = false
+boundary_glow_enabled = false
 flow_speed = 1.25
 flow_amplitude = 2.0
 show_debug_overlay = false

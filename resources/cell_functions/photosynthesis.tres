@@ -1,6 +1,8 @@
-[gd_resource type="Resource" script_class="CellFunctionDef" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="CellFunctionDef" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://src/sim/catalog/cell_function_def.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/textures/cell_functions/photosynthesis.png" id="2_photosynthesis_texture"]
+[ext_resource type="SpriteFrames" path="res://resources/cell_functions/photosynthesis_frames.tres" id="3_photosynthesis_frames"]
 
 [resource]
 script = ExtResource("1")
@@ -17,3 +19,7 @@ protection_value = 0.0
 requires_surface = true
 boundary_outline_scale = 1.0
 visual_weight = 1.0
+outer_sprite_texture = ExtResource("2_photosynthesis_texture")
+outer_sprite_frames = ExtResource("3_photosynthesis_frames")
+animation_base_fps = 8.0
+animation_modulation_strength = 0.5

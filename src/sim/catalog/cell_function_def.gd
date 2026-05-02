@@ -14,3 +14,9 @@ extends Resource
 @export var requires_surface: bool = false
 @export_range(0.5, 2.0, 0.05) var boundary_outline_scale: float = 1.0
 @export var visual_weight: float = 1.0
+@export var outer_sprite_texture: Texture2D = null
+@export var inner_sprite_texture: Texture2D = null
+@export var outer_sprite_frames: SpriteFrames = null
+@export var inner_sprite_frames: SpriteFrames = null
+@export_range(1.0, 24.0, 0.5) var animation_base_fps: float = 8.0
+@export_range(0.0, 1.0, 0.05) var animation_modulation_strength: float = 0.5

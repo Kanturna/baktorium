@@ -13,6 +13,7 @@ var render_config
 var snapshot
 var elapsed_seconds: float = 0.0
 var boundary_overlay: Node2D
+var _sprite_nodes_by_key: Dictionary = {}
 
 
 func _ready() -> void:
@@ -30,12 +31,14 @@ func _process(delta: float) -> void:
 
 func set_snapshot(p_snapshot) -> void:
 	snapshot = p_snapshot
+	_sync_sprite_nodes()
 	_sync_boundary_overlay()
 	queue_redraw()
 
 
 func set_render_config(p_config) -> void:
 	render_config = p_config
+	_sync_sprite_nodes()
 	_sync_boundary_overlay()
 	queue_redraw()
 
@@ -43,12 +46,18 @@ func set_render_config(p_config) -> void:
 func _draw() -> void:
 	if render_config == null:
 		return
-	draw_rect(Rect2(Vector2(-2000, -2000), Vector2(4000, 4000)), render_config.background_color, true)
+	draw_rect(Rect2(Vector2(-4000, -4000), Vector2(8000, 8000)), render_config.background_color, true)
 	if snapshot == null:
 		return
 
+	if _is_beauty_mode():
+		if render_config.boundary_glow_enabled or render_config.flow_enabled:
+			for edge in snapshot.boundary_edges:
+				_draw_boundary_edge(edge)
+		return
+
 	for cell_data in snapshot.cells:
-		_draw_cell(cell_data)
+		_draw_debug_cell(cell_data)
 
 	for edge in snapshot.boundary_edges:
 		_draw_boundary_edge(edge)
@@ -59,7 +68,7 @@ func _draw() -> void:
 			HexDebugOverlay.draw_cell_label(self, center, cell_data, render_config)
 
 
-func _draw_cell(cell_data: Dictionary) -> void:
+func _draw_debug_cell(cell_data: Dictionary) -> void:
 	var center = _coord_to_pixel(cell_data["coord"])
 	var polygon = _translated_polygon(center)
 	var color: Color = cell_data["base_color"]
@@ -71,10 +80,10 @@ func _draw_cell(cell_data: Dictionary) -> void:
 	outline_color.a = 0.38
 	HexOutlineDrawer.draw_polygon_outline(self, polygon, outline_color, render_config.inner_outline_width)
 
-	_draw_accent(center, cell_data)
+	_draw_debug_accent(center, cell_data)
 
 
-func _draw_accent(center: Vector2, cell_data: Dictionary) -> void:
+func _draw_debug_accent(center: Vector2, cell_data: Dictionary) -> void:
 	var energy_activity = clampf(float(cell_data.get("energy_activity", 0.0)), 0.0, 1.0)
 	match cell_data.get("accent_kind", "none"):
 		"glow_disc":
@@ -127,10 +136,124 @@ func _translated_polygon(center: Vector2) -> PackedVector2Array:
 	return translated
 
 
-func _sync_boundary_overlay() -> void:
-	if boundary_overlay == null or snapshot == null or render_config == null:
+func _sync_sprite_nodes() -> void:
+	if snapshot == null or render_config == null:
+		_set_sprite_nodes_visible(false)
 		return
-	HexOutlineDrawer.sync_boundary_overlay(boundary_overlay, _boundary_segments())
+
+	if not _is_beauty_mode():
+		_set_sprite_nodes_visible(false)
+		return
+
+	var active_keys: Dictionary = {}
+	for cell_data in snapshot.cells:
+		var key = _cell_key(cell_data)
+		active_keys[key] = true
+		var node = _ensure_sprite_node(key, cell_data)
+		_configure_sprite_node(node, cell_data)
+
+	for key in _sprite_nodes_by_key.keys():
+		if not active_keys.has(key):
+			var stale = _sprite_nodes_by_key[key]
+			if is_instance_valid(stale):
+				stale.queue_free()
+			_sprite_nodes_by_key.erase(key)
+
+
+func _ensure_sprite_node(key: String, cell_data: Dictionary) -> Node2D:
+	var frames = cell_data.get("sprite_frames", null)
+	var wants_animated = frames != null
+	var node = _sprite_nodes_by_key.get(key)
+	if node != null and is_instance_valid(node):
+		if wants_animated and node is AnimatedSprite2D:
+			return node
+		if not wants_animated and node is Sprite2D:
+			return node
+		node.queue_free()
+
+	node = AnimatedSprite2D.new() if wants_animated else Sprite2D.new()
+	node.name = "CellSprite_%s" % key.replace(",", "_")
+	add_child(node)
+	_sprite_nodes_by_key[key] = node
+	return node
+
+
+func _configure_sprite_node(node: Node2D, cell_data: Dictionary) -> void:
+	node.visible = _is_beauty_mode()
+	node.position = _coord_to_pixel(cell_data["coord"])
+	node.scale = Vector2.ONE * _calculate_sprite_scale(cell_data)
+	node.modulate = _calculate_sprite_modulate(cell_data)
+	node.z_index = 2
+
+	if node is AnimatedSprite2D:
+		var animated = node as AnimatedSprite2D
+		animated.sprite_frames = cell_data.get("sprite_frames", null)
+		animated.animation = &"default"
+		animated.speed_scale = _calculate_animation_speed(cell_data)
+		if not animated.is_playing():
+			animated.play("default")
+	elif node is Sprite2D:
+		var sprite = node as Sprite2D
+		sprite.texture = cell_data.get("sprite_texture", null)
+
+
+func _set_sprite_nodes_visible(is_visible: bool) -> void:
+	for node in _sprite_nodes_by_key.values():
+		if is_instance_valid(node):
+			node.visible = is_visible
+
+
+func _calculate_sprite_scale(cell_data: Dictionary) -> float:
+	var texture = _selected_texture(cell_data)
+	if texture == null:
+		return 1.0
+	var source_size = maxf(float(texture.get_width()), float(texture.get_height()))
+	if source_size <= 0.0:
+		return 1.0
+	var target_diameter = render_config.hex_radius * 2.0 * render_config.sprite_diameter_scale
+	return target_diameter / source_size
+
+
+func _selected_texture(cell_data: Dictionary):
+	var frames = cell_data.get("sprite_frames", null)
+	if frames != null and frames.has_animation(&"default") and frames.get_frame_count(&"default") > 0:
+		return frames.get_frame_texture(&"default", 0)
+	return cell_data.get("sprite_texture", null)
+
+
+func _calculate_animation_speed(cell_data: Dictionary) -> float:
+	var modulator = clampf(float(cell_data.get("animation_modulator", 0.5)), 0.0, 1.0)
+	var strength = clampf(float(cell_data.get("animation_modulation_strength", 0.0)), 0.0, 1.0)
+	return clampf(1.0 + strength * (modulator - 0.5) * 2.0, 0.25, 2.0)
+
+
+func _calculate_sprite_modulate(cell_data: Dictionary) -> Color:
+	var color = Color.WHITE
+	var energy_ratio = clampf(float(cell_data.get("energy_tint_strength", 0.0)), 0.0, 1.0)
+	var energy_activity = clampf(float(cell_data.get("energy_activity", 0.0)), 0.0, 1.0)
+	if cell_data.get("energy_low", false):
+		return color.lerp(Color(1.0, 0.35, 0.25, 1.0), 0.16)
+	var boost = clampf(energy_ratio * 0.05 + energy_activity * 0.08, 0.0, 0.16)
+	return color.lerp(Color(1.0, 0.96, 0.74, 1.0), boost)
+
+
+func _is_beauty_mode() -> bool:
+	return render_config != null and render_config.render_mode == "beauty"
+
+
+func _cell_key(cell_data: Dictionary) -> String:
+	return "%d,%d" % [int(cell_data["q"]), int(cell_data["r"])]
+
+
+func _sync_boundary_overlay() -> void:
+	if boundary_overlay == null:
+		return
+	if snapshot == null or render_config == null:
+		HexOutlineDrawer.sync_boundary_overlay(boundary_overlay, [])
+		return
+	var should_show_boundary = (not _is_beauty_mode()) or render_config.boundary_glow_enabled
+	boundary_overlay.visible = should_show_boundary
+	HexOutlineDrawer.sync_boundary_overlay(boundary_overlay, _boundary_segments() if should_show_boundary else [])
 
 
 func _boundary_segments() -> Array:

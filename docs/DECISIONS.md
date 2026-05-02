@@ -36,6 +36,8 @@ Rules:
 - `HexOutlineDrawer` and `DebugMenuAdapter` are the project-facing adapters.
 - Built-in `_draw()` remains the fallback for organism rendering.
 - Assets must not write simulation state.
+- User-provided cell sprites live in `assets/textures/cell_functions/` and are documented through ADR-011.
+- Kenney Particle Pack lives in `addons/kenney_particle_pack/`, is used only through `ParticleEffectAdapter`, and must not write simulation state.
 
 Plugin-mandatory autoloads:
 
@@ -53,9 +55,11 @@ Reason: Flow is useful for first visual calibration, but later growth/performanc
 
 ## ADR-006: Visual Function Metadata Is Data-Driven
 
-Decision: Cell-specific accent style and boundary outline emphasis live on `CellFunctionDef`, not as hard-coded renderer branches per function id.
+Decision: Cell-specific accent style, boundary outline emphasis, and visual sprite recipes live on `CellFunctionDef`, not as hard-coded renderer branches per function id.
 
 Reason: Slice 2+ can add visible cell functions without rewriting renderer logic or mixing simulation identity with presentation recipes.
+
+Implementation rule: Sim systems do not read these visual fields. They are exclusively copied by runtime snapshots and consumed by rendering.
 
 ## ADR-007: Energy Tick Architecture
 
@@ -94,3 +98,60 @@ Implementation:
 - `C` resets camera position and zoom.
 - `G` toggles debug overlay because `D` is reserved for camera pan.
 - HUD remains in `CanvasLayer` so camera zoom does not scale the HUD text.
+
+## ADR-010: Simulation Truth vs Visual Truth
+
+Decision: Slice 2 Polish Iter A separates simulation truth from visual truth.
+
+Simulation truth:
+
+- axial coordinates, function ids, bodies, energy state, boundary/frontier derivation, and placement authority
+- writable only through simulation-owned APIs such as `SimulationService.place_cell()`
+
+Visual truth:
+
+- sprites, SpriteFrames, animation speed, glow, particles, sprite tint, and Beauty/Debug presentation
+- derived from snapshots and render configuration
+- never authoritative for simulation rules
+
+Reason: The first bacterium should look organic and detailed without weakening the core rule that a cell is data, not a Godot node.
+
+Implementation:
+
+- `OrganismSnapshotBuilder` copies render recipes out of cell-function definitions into snapshot dictionaries.
+- `HexOrganismRenderer` consumes only snapshot data.
+- Beauty mode may hide hard hex geometry; Debug mode shows hard hex polygons and labels.
+- Camera controls remain view-only per ADR-009.
+
+## ADR-011: Custom Cell Sprites With Animation
+
+Decision: Slice 2 Polish Iter A uses user-provided custom cell sprites and 5x2 animation sheets for the selected starter functions.
+
+Selected assets:
+
+- `energy_core`: `assets/textures/cell_functions/energy_core.png` and `energy_core_frames.png`
+- `photosynthesis`: `assets/textures/cell_functions/photosynthesis.png` and `photosynthesis_frames.png`
+- `reproduction`: `assets/textures/cell_functions/reproduction.png` and `reproduction_frames.png`
+- `wall`: `assets/textures/cell_functions/wall_outer.png`, `wall_outer_frames.png`, `wall_inner.png`, and `wall_inner_frames.png`
+
+Schema:
+
+- `outer_sprite_texture`
+- `inner_sprite_texture`
+- `outer_sprite_frames`
+- `inner_sprite_frames`
+- `animation_base_fps`
+- `animation_modulation_strength`
+
+Rules:
+
+- SpriteFrames are built from measured 5x2 sheet dimensions; the implementation must not assume 1024 px or exact divisibility by 5.
+- Mipmaps are required for cell textures because the lab camera supports mouse-wheel zoom.
+- Wall cells use the outer sprite on boundary cells and the inner sprite on interior cells.
+- Beauty mode uses pooled `Sprite2D` and `AnimatedSprite2D` children; Debug mode hides those children and uses the polygon `_draw()` path.
+- `G` toggles Beauty/Debug because `D` belongs to camera pan.
+- `hex_radius` remains `42.0` until the Beauty-mode sign-off explicitly changes visual scale.
+
+Provenance: cell sprites and animation sheets were provided by the user from their ChatGPT/OpenAI workflow. Non-selected variants stay in `_alternates/` until the visual direction is signed off.
+
+Re-evaluation trigger: before 250+ cells or Slice 5 scale work, evaluate TextureAtlas/MultiMesh or another batched render path.

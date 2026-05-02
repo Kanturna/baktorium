@@ -4,12 +4,16 @@ extends Node2D
 const CellFunctionCatalog = preload("res://src/sim/catalog/cell_function_catalog.gd")
 const DebugMenuAdapter = preload("res://src/debug/debug_menu_adapter.gd")
 const EnergyConfig = preload("res://src/sim/energy/energy_config.gd")
+const HexCoord = preload("res://src/core/hex/hex_coord.gd")
+const HexGridMath = preload("res://src/core/hex/hex_grid_math.gd")
 const HexOrganismRenderer = preload("res://src/rendering/hex_organism_renderer.gd")
 const HexRenderConfig = preload("res://src/rendering/hex_render_config.gd")
 const OrganismSnapshotBuilder = preload("res://src/runtime/organism_snapshot_builder.gd")
+const ParticleEffectAdapter = preload("res://src/rendering/particle_effect_adapter.gd")
 const PerfProbe = preload("res://src/debug/perf_probe.gd")
 const SimulationService = preload("res://src/sim/simulation_service.gd")
 const StarterBacteriumFactory = preload("res://src/sim/body/starter_bacterium_factory.gd")
+const WorldEnvironmentAdapter = preload("res://src/rendering/world_environment_adapter.gd")
 
 const ORGANISM_ID = 1
 
@@ -21,11 +25,15 @@ const ORGANISM_ID = 1
 @export_range(0.20, 1.00, 0.01) var camera_min_zoom: float = 0.45
 @export_range(1.00, 4.00, 0.05) var camera_max_zoom: float = 2.25
 @export_range(0.20, 2.00, 0.01) var camera_default_zoom: float = 0.72
+@export var use_stress_body: bool = false
+@export_range(7, 250, 1) var stress_cell_count: int = 100
 
 var service: SimulationService
 var catalog: CellFunctionCatalog
 var renderer: HexOrganismRenderer
 var lab_camera: Camera2D
+var world_environment: WorldEnvironment
+var ambient_particles: Node
 var info_label: Label
 var perf_probe = PerfProbe.new()
 var energy_accumulator: float = 0.0
@@ -49,8 +57,11 @@ func _ready() -> void:
 	add_child(renderer)
 
 	_create_camera()
+	world_environment = WorldEnvironmentAdapter.ensure_single_instance(self)
+	ambient_particles = ParticleEffectAdapter.setup_world_ambient(self)
 
 	_create_ui()
+	_apply_render_mode()
 	_rebuild()
 
 
@@ -116,8 +127,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			seed = int(Time.get_unix_time_from_system()) % 100000
 			_rebuild()
 		KEY_G:
-			render_config.show_debug_overlay = not render_config.show_debug_overlay
-			renderer.queue_redraw()
+			render_config.render_mode = "debug" if render_config.render_mode == "beauty" else "beauty"
+			_apply_render_mode()
 			_update_label()
 		KEY_F:
 			render_config.flow_enabled = not render_config.flow_enabled
@@ -175,7 +186,7 @@ func _rebuild() -> void:
 	perf_probe.reset()
 	var body_start = Time.get_ticks_usec()
 	service.clear()
-	var body = StarterBacteriumFactory.new().build(service, ORGANISM_ID, seed)
+	var body = _build_stress_body() if use_stress_body else StarterBacteriumFactory.new().build(service, ORGANISM_ID, seed)
 	perf_probe.body_build_usec = Time.get_ticks_usec() - body_start
 	perf_probe.cell_count = body.get_cell_count()
 	service.reset_energy(ORGANISM_ID, catalog, energy_config)
@@ -204,8 +215,10 @@ func _update_label() -> void:
 	var max_energy = float(energy_metrics.get("max_energy", 0.0))
 	var energy_ratio = float(energy_metrics.get("energy_ratio", 0.0))
 	var low_marker = " LOW" if max_energy > 0.0 and energy_ratio <= energy_config.low_energy_ratio else ""
-	info_label.text = "Baktorium Slice 2\nSeed: %d\nCells: %d\nEnergy: %.1f/%.1f%s\nProd: %.1f  Maint: %.1f  Net: %.1f  Tick: %d\nBody: %dus Energy: %dus Snapshot: %dus\nG Debug  F Flow:%s  N/B/R Seed  F3 Menu\nWASD/Arrows Pan  Wheel Zoom  C Camera" % [
+	info_label.text = "Baktorium Slice 2\nSeed: %d  Mode: %s%s\nCells: %d\nEnergy: %.1f/%.1f%s\nProd: %.1f  Maint: %.1f  Net: %.1f  Tick: %d\nBody: %dus Energy: %dus Snapshot: %dus\nG Beauty/Debug  F Flow:%s  N/B/R Seed  F3 Menu\nWASD/Arrows Pan  Wheel Zoom  C Camera" % [
 		seed,
+		render_config.render_mode,
+		" stress" if use_stress_body else "",
 		perf_probe.cell_count,
 		current_energy,
 		max_energy,
@@ -219,3 +232,52 @@ func _update_label() -> void:
 		perf_probe.snapshot_build_usec,
 		"on" if render_config.flow_enabled else "off",
 	]
+
+
+func _apply_render_mode() -> void:
+	if render_config == null:
+		return
+	var is_debug = render_config.render_mode == "debug"
+	render_config.show_debug_overlay = is_debug
+	render_config.show_coordinates = is_debug
+	render_config.show_function_ids = is_debug
+	WorldEnvironmentAdapter.set_glow_enabled(world_environment, not is_debug)
+	ParticleEffectAdapter.set_enabled(ambient_particles, not is_debug)
+	if renderer != null:
+		renderer.set_render_config(render_config)
+
+
+func _build_stress_body():
+	service.create_organism(ORGANISM_ID, seed)
+	var coords = _build_connected_stress_coords(stress_cell_count)
+	for index in coords.size():
+		service.place_cell(ORGANISM_ID, coords[index], _stress_function_id(index), seed + index * 97)
+	return service.get_body(ORGANISM_ID)
+
+
+func _build_connected_stress_coords(count: int) -> Array:
+	var target_count = maxi(1, count)
+	var coords: Array = [HexCoord.new(0, 0)]
+	var seen = {coords[0].to_key(): true}
+	var cursor = 0
+	while coords.size() < target_count and cursor < coords.size():
+		for neighbor_coord in HexGridMath.neighbors(coords[cursor]):
+			var key = neighbor_coord.to_key()
+			if seen.has(key):
+				continue
+			seen[key] = true
+			coords.append(neighbor_coord)
+			if coords.size() >= target_count:
+				break
+		cursor += 1
+	return coords
+
+
+func _stress_function_id(index: int) -> StringName:
+	if index == 0:
+		return &"energy_core"
+	if index % 11 == 0:
+		return &"reproduction"
+	if index % 3 == 0:
+		return &"photosynthesis"
+	return &"wall"

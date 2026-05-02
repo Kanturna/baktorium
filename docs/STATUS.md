@@ -2,7 +2,7 @@
 
 ## Current Slice
 
-Slice 2.4: Lab Camera Controls after Energy v0.
+Slice 2 Polish Iter A: Beauty Layer after Energy v0.
 
 ## Implemented In This Slice
 
@@ -17,6 +17,8 @@ Slice 2.4: Lab Camera Controls after Energy v0.
 - Claude Code follow-up hardening: private `SimulationService` storage, data-driven visual accent metadata, stricter plugin adapter boundary tests, typed lab/config and cell coordinate fields.
 - Organism-pool energy state, fixed energy ticks, energy config resource, energy snapshot fields, lab HUD energy feedback, and 100-cell stress validation.
 - Built-in `Camera2D` lab navigation with WASD/arrow pan, mouse-wheel zoom, `C` reset, and compact default view.
+- Beauty/Debug render mode foundation using custom cell sprites, dynamic 5x2 SpriteFrames, render-only visual metadata, WorldEnvironment glow, ambient particles, and `G` mode toggle.
+- 100-cell lab stress body override for manual Beauty-mode performance checks.
 
 ## Not Implemented
 
@@ -26,7 +28,8 @@ Slice 2.4: Lab Camera Controls after Energy v0.
 - Multiple organisms.
 - Movement, collision, combat, digestion, sensors.
 - Manual visual sign-off by the user.
-- Visual calibration pass for detailed wall-hex plus flowing membrane style.
+- Manual Beauty-mode sign-off for Iter A.
+- `png/` cleanup after Beauty-mode sign-off.
 
 ## Validation
 
@@ -35,4 +38,13 @@ Run after changes:
 ```powershell
 D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_slice_2_camera_validation.gd
 D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_slice_2_validation.gd
+```
+
+Slice 2 Polish Iter A adds:
+
+```powershell
+D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_polish_a1_assets_validation.gd
+D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_polish_a2_renderer_validation.gd
+D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_polish_a3_environment_validation.gd
+D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_polish_iter_a_validation.gd
 ```

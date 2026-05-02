@@ -45,6 +45,10 @@ func _validate_docs(failures: Array[String]) -> void:
 		failures.append("DECISIONS.md missing ADR-007.")
 	if not decisions.contains("ADR-008: Slice 2 Tick Mechanism"):
 		failures.append("DECISIONS.md missing ADR-008.")
+	if not decisions.contains("ADR-010: Simulation Truth vs Visual Truth"):
+		failures.append("DECISIONS.md missing ADR-010.")
+	if not decisions.contains("ADR-011: Custom Cell Sprites With Animation"):
+		failures.append("DECISIONS.md missing ADR-011.")
 	var findings = FileAccess.get_file_as_string("res://docs/FINDINGS.md")
 	if not findings.contains("TimeService") or not findings.contains("SimulationService grows"):
 		failures.append("FINDINGS.md missing Slice 2 future evaluation triggers.")

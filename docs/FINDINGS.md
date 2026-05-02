@@ -10,6 +10,9 @@ Use this file for bugs, review findings, debug notes, risks, and planned correct
 - Before Slice 5, evaluate whether the lab-driven energy tick should become a shared `TimeService` for WorldGrid and multiple organisms.
 - SimulationService grows with each sim system. Before Slice 5, reassess whether it should remain the central gateway or split into dedicated services with `SimulationService` as orchestrator.
 - Visual quality is not yet acceptable. Before growth, plan a visual calibration slice for smaller framing, richer wall-hex detail, better palette, and flowing outer membrane.
+- Hex-radius remains at `42.0` for Slice 2 Polish Iter A. Re-evaluate Hex-radius as a visual tuning option after Beauty-mode sign-off.
+- Particle adapter currently owns only ambient world drift. Extend it in Slice 3 for cell event bursts and Slice 4 for organism aura only when those effects become real slice requirements.
+- Before 250+ cells, evaluate whether the Beauty renderer should move from pooled `Sprite2D`/`AnimatedSprite2D` nodes to TextureAtlas, MultiMesh, or another batched path.
 
 ## Resolved Findings
 
