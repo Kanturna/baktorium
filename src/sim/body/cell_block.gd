@@ -3,12 +3,12 @@ extends RefCounted
 
 const HexCoord = preload("res://src/core/hex/hex_coord.gd")
 
-var coord
+var coord: HexCoord
 var function_id: StringName
 var visual_seed: int
 
 
-func _init(p_coord = null, p_function_id: StringName = &"", p_visual_seed: int = 0) -> void:
+func _init(p_coord: HexCoord = null, p_function_id: StringName = &"", p_visual_seed: int = 0) -> void:
 	coord = p_coord if p_coord != null else HexCoord.new()
 	function_id = p_function_id
 	visual_seed = p_visual_seed

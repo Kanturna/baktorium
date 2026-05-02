@@ -13,7 +13,7 @@ const StarterBacteriumFactory = preload("res://src/sim/body/starter_bacterium_fa
 const ORGANISM_ID = 1
 
 @export var seed: int = 1
-@export var render_config: Resource
+@export var render_config: HexRenderConfig
 
 var service
 var catalog

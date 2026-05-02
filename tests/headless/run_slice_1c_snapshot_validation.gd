@@ -28,14 +28,21 @@ func _validate_snapshot(snapshot, failures: Array[String]) -> void:
 	for cell_data in snapshot.cells:
 		if not cell_data.has("coord") or not cell_data.has("function_id") or not cell_data.has("base_color"):
 			failures.append("Snapshot cell data missing required render fields.")
+		if not cell_data.has("accent_kind") or not cell_data.has("accent_color"):
+			failures.append("Snapshot cell data missing data-driven accent fields.")
 		if cell_data.has("cell_ref") or cell_data.has("body"):
 			failures.append("Snapshot must not expose mutable body/cell references.")
+	for edge in snapshot.boundary_edges:
+		if not edge.has("boundary_outline_scale"):
+			failures.append("Snapshot boundary edge missing data-driven boundary outline scale.")
 
 
 func _validate_renderer_boundary(failures: Array[String]) -> void:
 	var renderer_source = FileAccess.get_file_as_string("res://src/rendering/hex_organism_renderer.gd")
 	if renderer_source.contains("OrganismBody") or renderer_source.contains("get_body("):
 		failures.append("Renderer must not depend on OrganismBody.")
+	if renderer_source.contains("function_id\") == &\"wall\"") or renderer_source.contains("function_id\"] == &\"wall\""):
+		failures.append("Renderer must not hard-code wall function ids for boundary styling.")
 	var snapshot_source = FileAccess.get_file_as_string("res://src/runtime/organism_render_snapshot.gd")
 	if snapshot_source.is_empty():
 		failures.append("OrganismRenderSnapshot must live in src/runtime/.")

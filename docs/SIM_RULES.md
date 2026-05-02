@@ -35,6 +35,12 @@ The starter body has exactly seven cells:
 | `reproduction` | visible growth organ placeholder | growth charge source |
 | `wall` | visible membrane/body structure | protection and boundary material |
 
+Slice 1 cell-function resources also carry visual metadata:
+
+- `accent_kind` controls non-simulation accent drawing such as nucleus glow, surface dots, or reproduction rings.
+- `boundary_outline_scale` controls boundary emphasis without renderer hard-coding.
+- `requires_surface` marks functions that should live on organism surfaces once growth rules exist.
+
 ## Genome Schema
 
 `Genome` exists in Slice 1 only as an inactive schema with eight normalized fields:
@@ -47,4 +53,3 @@ The starter body has exactly seven cells:
 - `surface_preference`
 - `energy_efficiency`
 - `mutation_rate`
-

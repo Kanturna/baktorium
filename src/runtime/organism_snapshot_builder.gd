@@ -16,6 +16,7 @@ static func build(body, catalog):
 		var definition = catalog.get_definition(cell.function_id) if catalog != null else null
 		var base_color = definition.base_color if definition != null else Color.WHITE
 		var accent_color = definition.accent_color if definition != null else Color.WHITE
+		var accent_kind = definition.accent_kind if definition != null else "none"
 		snapshot.cells.append({
 			"coord": cell.coord.duplicate_coord(),
 			"q": cell.coord.q,
@@ -23,10 +24,15 @@ static func build(body, catalog):
 			"function_id": cell.function_id,
 			"base_color": base_color,
 			"accent_color": accent_color,
+			"accent_kind": accent_kind,
 			"visual_seed": cell.visual_seed,
 			"is_boundary": body.is_boundary_cell(cell.coord),
 		})
 
-	snapshot.boundary_edges = body.get_boundary_edges()
+	for edge in body.get_boundary_edges():
+		var edge_definition = catalog.get_definition(edge["function_id"]) if catalog != null else null
+		var edge_copy = edge.duplicate(true)
+		edge_copy["boundary_outline_scale"] = edge_definition.boundary_outline_scale if edge_definition != null else 1.0
+		snapshot.boundary_edges.append(edge_copy)
 	snapshot.cell_count = snapshot.cells.size()
 	return snapshot

@@ -33,13 +33,16 @@ SimulationService.place_cell(organism_id, coord, function_id, visual_seed)
 
 `OrganismBody` has only an internal `_place_cell_internal()` method. This keeps the later `WorldGrid` extension possible without changing callers.
 
+`SimulationService` internal organism storage and placement counters are private implementation details. Tests and debug UI may read counters only through explicit getters.
+
 ## Rendering Contract
 
 Renderers read `OrganismRenderSnapshot` from `src/runtime/`. They must not read or mutate `OrganismBody` directly.
 
 The first renderer uses `Node2D._draw()` plus optional adapter-based antialiased boundary drawing. A later MultiMesh or TileMapLayer spike must preserve the same snapshot contract.
 
+Visual differences between cell functions are driven by render metadata copied into the snapshot. Renderers may branch on accent recipe names, not on simulation function ids.
+
 ## Asset Contract
 
 External plugins live in `addons/` and are connected through adapter scripts. They may improve rendering or debugging, but they do not own simulation state.
-

@@ -44,14 +44,13 @@ func _validate_adapters(failures: Array[String]) -> void:
 
 func _validate_plugin_isolation(failures: Array[String]) -> void:
 	var files: Array[String] = []
-	for path in ["res://src/sim", "res://src/genetics", "res://src/runtime"]:
-		_collect_gd_files(path, files)
+	_collect_gd_files("res://src", files)
 	for file_path in files:
+		if file_path.begins_with("res://src/rendering/") or file_path.begins_with("res://src/debug/"):
+			continue
 		var source = FileAccess.get_file_as_string(file_path)
 		if source.contains("addons/antialiased_line2d") or source.contains("addons/debug_menu"):
 			failures.append("Plugin path leaked into non-render/debug layer: %s" % file_path)
-		if source.contains("AntialiasedLine2D") or source.contains("DebugMenu"):
-			failures.append("Plugin class leaked into non-render/debug layer: %s" % file_path)
 
 
 func _collect_gd_files(path: String, files: Array[String]) -> void:

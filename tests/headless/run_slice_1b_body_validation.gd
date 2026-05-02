@@ -46,6 +46,18 @@ func _validate_catalog(catalog, failures: Array[String]) -> void:
 	for id in [&"energy_core", &"photosynthesis", &"reproduction", &"wall"]:
 		if not catalog.has_function(id):
 			failures.append("Catalog missing %s." % id)
+	var energy = catalog.get_definition(&"energy_core")
+	var photo = catalog.get_definition(&"photosynthesis")
+	var reproduction = catalog.get_definition(&"reproduction")
+	var wall = catalog.get_definition(&"wall")
+	if energy == null or energy.accent_kind != "glow_disc":
+		failures.append("energy_core should define glow_disc accent metadata.")
+	if photo == null or photo.accent_kind != "surface_dot" or not photo.requires_surface:
+		failures.append("photosynthesis should define surface_dot accent metadata and require surface.")
+	if reproduction == null or reproduction.accent_kind != "ring_arc" or not reproduction.requires_surface:
+		failures.append("reproduction should define ring_arc accent metadata and require surface.")
+	if wall == null or wall.boundary_outline_scale <= 1.0 or not wall.requires_surface:
+		failures.append("wall should define stronger boundary outline metadata and require surface.")
 
 
 func _validate_genome_schema(failures: Array[String]) -> void:
@@ -65,8 +77,11 @@ func _validate_genome_schema(failures: Array[String]) -> void:
 
 
 func _validate_factory_uses_service(service, failures: Array[String]) -> void:
-	if service.placement_count != 7:
-		failures.append("Starter factory should place exactly 7 cells through SimulationService; got %d." % service.placement_count)
+	if service.get_placement_count() != 7:
+		failures.append("Starter factory should place exactly 7 cells through SimulationService; got %d." % service.get_placement_count())
+	for property in service.get_property_list():
+		if property.get("name") in ["bodies_by_id", "placement_count"]:
+			failures.append("SimulationService must not expose public %s." % property.get("name"))
 	var source = FileAccess.get_file_as_string("res://src/sim/body/starter_bacterium_factory.gd")
 	if source.contains("._place_cell_internal") or source.contains(".add_cell"):
 		failures.append("StarterBacteriumFactory must not place cells through OrganismBody directly.")

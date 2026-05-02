@@ -70,19 +70,24 @@ func _draw_cell(cell_data: Dictionary) -> void:
 	outline_color.a = 0.38
 	HexOutlineDrawer.draw_polygon_outline(self, polygon, outline_color, render_config.inner_outline_width)
 
-	if cell_data["function_id"] == &"energy_core":
-		var glow_color: Color = cell_data["accent_color"]
-		glow_color.a = render_config.glow_strength
-		draw_circle(center, render_config.hex_radius * 0.44, glow_color)
-		draw_circle(center, render_config.hex_radius * 0.18, cell_data["accent_color"])
-	elif cell_data["function_id"] == &"photosynthesis":
-		var accent: Color = cell_data["accent_color"]
-		accent.a = 0.65
-		draw_circle(center + Vector2(0, -render_config.hex_radius * 0.12), render_config.hex_radius * 0.16, accent)
-	elif cell_data["function_id"] == &"reproduction":
-		var accent_repro: Color = cell_data["accent_color"]
-		accent_repro.a = 0.55
-		draw_arc(center, render_config.hex_radius * 0.24, 0.0, TAU, 24, accent_repro, 3.0, true)
+	_draw_accent(center, cell_data)
+
+
+func _draw_accent(center: Vector2, cell_data: Dictionary) -> void:
+	match cell_data.get("accent_kind", "none"):
+		"glow_disc":
+			var glow_color: Color = cell_data["accent_color"]
+			glow_color.a = render_config.glow_strength
+			draw_circle(center, render_config.hex_radius * 0.44, glow_color)
+			draw_circle(center, render_config.hex_radius * 0.18, cell_data["accent_color"])
+		"surface_dot":
+			var accent: Color = cell_data["accent_color"]
+			accent.a = 0.65
+			draw_circle(center + Vector2(0, -render_config.hex_radius * 0.12), render_config.hex_radius * 0.16, accent)
+		"ring_arc":
+			var accent_repro: Color = cell_data["accent_color"]
+			accent_repro.a = 0.55
+			draw_arc(center, render_config.hex_radius * 0.24, 0.0, TAU, 24, accent_repro, 3.0, true)
 
 
 func _draw_boundary_edge(edge: Dictionary) -> void:
@@ -131,7 +136,7 @@ func _edge_to_segment(edge: Dictionary) -> Dictionary:
 	var direction: int = edge["direction"]
 	var center = _coord_to_pixel(coord)
 	var polygon = _translated_polygon(center)
-	var width = render_config.wall_outline_width if edge["function_id"] == &"wall" else render_config.boundary_outline_width
+	var width = render_config.boundary_outline_width * float(edge.get("boundary_outline_scale", 1.0))
 	return {
 		"from": polygon[direction],
 		"to": polygon[(direction + 1) % polygon.size()],

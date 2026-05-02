@@ -12,6 +12,8 @@ Decision: `SimulationService.place_cell()` is the only public placement API.
 
 Reason: Slice 5 can add `WorldGrid` occupancy without refactoring every caller.
 
+Implementation rule: `SimulationService` keeps organism storage and placement counters private. Callers use `place_cell()`, `get_body()`, `get_organism_ids()`, and read-only metrics such as `get_placement_count()`.
+
 ## ADR-003: Runtime Snapshot Between Sim And Rendering
 
 Decision: `OrganismRenderSnapshot` lives in `src/runtime/`.
@@ -48,3 +50,9 @@ Plugin-mandatory autoloads:
 Decision: `HexRenderConfig.flow_enabled` defaults to `false`.
 
 Reason: Flow is useful for first visual calibration, but later growth/performance work should not inherit a mandatory animation cost.
+
+## ADR-006: Visual Function Metadata Is Data-Driven
+
+Decision: Cell-specific accent style and boundary outline emphasis live on `CellFunctionDef`, not as hard-coded renderer branches per function id.
+
+Reason: Slice 2+ can add visible cell functions without rewriting renderer logic or mixing simulation identity with presentation recipes.

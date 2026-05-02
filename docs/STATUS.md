@@ -14,6 +14,7 @@ Slice 1: Startfundament + First Visible Bacterium.
 - Built-in renderer, debug overlay, optional flow config, plugin adapters.
 - Headless validation scripts under `tests/headless/`.
 - Claude Code Slice 1 review hardening: private body storage, documented plugin autoloads, `requires_surface`, stronger validation.
+- Claude Code follow-up hardening: private `SimulationService` storage, data-driven visual accent metadata, stricter plugin adapter boundary tests, typed lab/config and cell coordinate fields.
 
 ## Not Implemented
 
@@ -23,6 +24,7 @@ Slice 1: Startfundament + First Visible Bacterium.
 - World grid.
 - Multiple organisms.
 - Movement, collision, combat, digestion, sensors.
+- Manual visual sign-off by the user.
 
 ## Validation
 

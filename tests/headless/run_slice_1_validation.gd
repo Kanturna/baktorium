@@ -47,13 +47,16 @@ func _validate_public_body_surface(failures: Array[String]) -> void:
 	var service = SimulationService.new()
 	get_root().add_child(service)
 	var body = StarterBacteriumFactory.new().build(service, 1, 19)
-	if service.placement_count != 7:
+	if service.get_placement_count() != 7:
 		failures.append("SimulationService placement path failed.")
 	if body.has_method("add_cell"):
 		failures.append("OrganismBody exposes forbidden add_cell().")
 	for property in body.get_property_list():
 		if property.get("name") == "cells_by_key":
 			failures.append("OrganismBody exposes public cells_by_key.")
+	for property in service.get_property_list():
+		if property.get("name") in ["bodies_by_id", "placement_count"]:
+			failures.append("SimulationService exposes public %s." % property.get("name"))
 
 
 func _validate_source_boundaries(failures: Array[String]) -> void:
@@ -69,6 +72,9 @@ func _validate_source_boundaries(failures: Array[String]) -> void:
 		var source = FileAccess.get_file_as_string(file_path)
 		if source.contains(".cells_by_key"):
 			failures.append("Direct cells_by_key access outside OrganismBody: %s" % file_path)
+		if file_path != "res://src/sim/simulation_service.gd":
+			if source.contains(".bodies_by_id") or source.contains(".placement_count"):
+				failures.append("Direct SimulationService state access outside SimulationService: %s" % file_path)
 
 
 func _validate_project_entrypoint(failures: Array[String]) -> void:
