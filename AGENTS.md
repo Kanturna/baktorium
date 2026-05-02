@@ -38,3 +38,18 @@ Every implementation response should include:
 - commit description suggestion in a separate copyable block
 
 Do not auto-commit, push, or open PRs unless explicitly requested.
+
+## Cross-Agent Review
+
+Agents should explicitly recommend a second-agent review when it would improve quality or reduce architectural risk.
+
+Recommend review by another agent when a change:
+
+- touches architecture, layer boundaries, or simulation authority
+- introduces or changes a slice plan
+- adds external assets, plugins, autoloads, or adapter boundaries
+- changes core simulation data structures or runtime snapshots
+- has unclear tradeoffs, unresolved risks, or surprising test results
+- is large enough that a second perspective is likely to catch drift or hidden coupling
+
+Do not require cross-agent review for every small documentation or mechanical fix. When recommending review, name the requested reviewer focus clearly, for example: "Claude Code should review layer boundaries and hidden simulation truth" or "Codex should review implementation feasibility and test coverage."
