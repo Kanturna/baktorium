@@ -124,8 +124,8 @@ func _refresh_snapshot() -> void:
 		return
 	var snapshot_start = Time.get_ticks_usec()
 	var energy_metrics = service.get_energy_metrics(ORGANISM_ID)
-	energy_metrics["low_energy_ratio"] = energy_config.low_energy_ratio
-	var snapshot = OrganismSnapshotBuilder.build(body, catalog, energy_metrics)
+	var render_hints = {"low_energy_ratio": energy_config.low_energy_ratio}
+	var snapshot = OrganismSnapshotBuilder.build(body, catalog, energy_metrics, render_hints)
 	perf_probe.snapshot_build_usec = Time.get_ticks_usec() - snapshot_start
 	renderer.set_snapshot(snapshot)
 	_update_label()

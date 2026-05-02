@@ -25,8 +25,7 @@ func _validate_end_to_end_energy(failures: Array[String]) -> void:
 	for _i in 3:
 		service.tick_energy(1, catalog, config)
 	var metrics = service.get_energy_metrics(1)
-	metrics["low_energy_ratio"] = config.low_energy_ratio
-	var snapshot = OrganismSnapshotBuilder.build(body, catalog, metrics)
+	var snapshot = OrganismSnapshotBuilder.build(body, catalog, metrics, {"low_energy_ratio": config.low_energy_ratio})
 	if snapshot.cell_count != 7:
 		failures.append("Slice 2 should keep starter body at 7 cells.")
 	if body.get_cell_count() != 7:
@@ -58,6 +57,8 @@ func _validate_source_boundaries(failures: Array[String]) -> void:
 	var snapshot_source = FileAccess.get_file_as_string("res://src/runtime/organism_snapshot_builder.gd")
 	if snapshot_source.contains("get_body(") or snapshot_source.contains("tick_energy"):
 		failures.append("SnapshotBuilder should not call SimulationService APIs.")
+	if snapshot_source.contains("energy_metrics.get(\"low_energy_ratio\""):
+		failures.append("SnapshotBuilder should read render thresholds from render_hints, not energy_metrics.")
 
 
 func _finish(label: String, failures: Array[String]) -> void:

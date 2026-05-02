@@ -47,6 +47,8 @@ Visual differences between cell functions are driven by render metadata copied i
 
 Energy state is simulation truth and stays behind `SimulationService`. Runtime snapshots may carry copied energy metrics and derived per-cell render fields, but rendering and scenes must not hold mutable `OrganismEnergyState` references.
 
+Render thresholds such as low-energy warning ratios are render hints. They must be passed separately from `energy_metrics` so simulation read data stays semantically clean.
+
 Slice 2 uses the lab scene as composition root for fixed ticks. This is a deliberate local driver, not a global simulation clock.
 
 ## Asset Contract

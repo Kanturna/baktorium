@@ -28,3 +28,4 @@ Use this file for bugs, review findings, debug notes, risks, and planned correct
 - Added ADR-007 for energy state, static tick calculation, service API, and `energy_capacity`.
 - Added ADR-008 for lab-driven fixed ticks instead of an early `TimeService`.
 - Added stress-test and snapshot-boundary validation for energy.
+- Separated low-energy render hints from copied simulation energy metrics after Claude Code review.

@@ -69,6 +69,7 @@ Implementation:
 - `SimulationService` stores energy states privately in `_energy_states_by_id`.
 - Public energy access goes through `reset_energy()`, `tick_energy()`, and `get_energy_metrics()`.
 - `CellFunctionDef.energy_capacity` is the canonical schema field for energy storage capacity.
+- Runtime snapshot building keeps copied energy metrics separate from render hints such as low-energy warning thresholds.
 
 Reason: This preserves the Slice 1 service/snapshot boundary while adding the first active simulation system.
 

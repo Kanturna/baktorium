@@ -7,13 +7,14 @@ const OrganismBody = preload("res://src/sim/body/organism_body.gd")
 const OrganismRenderSnapshot = preload("res://src/runtime/organism_render_snapshot.gd")
 
 
-static func build(body, catalog, energy_metrics: Dictionary = {}):
+static func build(body, catalog, energy_metrics: Dictionary = {}, render_hints: Dictionary = {}):
 	var snapshot = OrganismRenderSnapshot.new(body.organism_id, body.seed)
 	var keys = body.get_cell_keys()
 	var boundary_outline_scale_by_function_id = _build_boundary_outline_scale_map(catalog)
 	snapshot.energy_metrics = energy_metrics.duplicate(true)
 	snapshot.organism_energy_ratio = clampf(float(energy_metrics.get("energy_ratio", 0.0)), 0.0, 1.0)
-	var is_low_energy = snapshot.organism_energy_ratio <= float(energy_metrics.get("low_energy_ratio", 0.25)) and float(energy_metrics.get("max_energy", 0.0)) > 0.0
+	var low_energy_ratio = float(render_hints.get("low_energy_ratio", 0.25))
+	var is_low_energy = snapshot.organism_energy_ratio <= low_energy_ratio and float(energy_metrics.get("max_energy", 0.0)) > 0.0
 
 	for key in keys:
 		var cell = body.get_cell_by_key(key)

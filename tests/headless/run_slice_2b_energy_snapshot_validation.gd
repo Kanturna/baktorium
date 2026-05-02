@@ -20,8 +20,7 @@ func _initialize() -> void:
 	service.tick_energy(1, catalog, config)
 
 	var metrics = service.get_energy_metrics(1)
-	metrics["low_energy_ratio"] = config.low_energy_ratio
-	var snapshot = OrganismSnapshotBuilder.build(body, catalog, metrics)
+	var snapshot = OrganismSnapshotBuilder.build(body, catalog, metrics, {"low_energy_ratio": config.low_energy_ratio})
 
 	_validate_snapshot_energy(snapshot, failures)
 	_validate_cell_energy_recipe(snapshot, failures)
@@ -36,6 +35,8 @@ func _validate_snapshot_energy(snapshot, failures: Array[String]) -> void:
 	_expect_close(snapshot.organism_energy_ratio, 17.6 / 30.0, "snapshot energy ratio", failures)
 	if snapshot.energy_metrics["current_energy"] != 17.6:
 		failures.append("Snapshot energy metrics should include current energy.")
+	if snapshot.energy_metrics.has("low_energy_ratio"):
+		failures.append("Snapshot energy metrics must not carry render thresholds.")
 	snapshot.energy_metrics["current_energy"] = 999.0
 	if snapshot.energy_metrics["current_energy"] != 999.0:
 		failures.append("Snapshot energy metrics should be local read data.")
@@ -77,6 +78,8 @@ func _validate_lab_contract(failures: Array[String]) -> void:
 	var lab_source = FileAccess.get_file_as_string("res://src/lab/starter_bacterium_lab.gd")
 	if not lab_source.contains("func _process") or not lab_source.contains("tick_energy"):
 		failures.append("Lab should own Slice 2 composition-root energy tick.")
+	if lab_source.contains("energy_metrics[\"low_energy_ratio\"]"):
+		failures.append("Lab must pass low_energy_ratio as render hints, not mutate energy metrics.")
 	if lab_source.contains("TimeService"):
 		failures.append("Slice 2 should not introduce TimeService autoload.")
 	if not lab_source.contains("Energy:") or not lab_source.contains("Net:"):
