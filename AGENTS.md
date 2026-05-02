@@ -13,6 +13,12 @@ Before code changes, read:
 ## Slice Discipline
 
 - Work in slices that are as large as possible and as small as needed.
+- Do not split work into tiny micro-slices when one coherent thematic slice can be implemented, reviewed, and validated without raising risk.
+- It is acceptable to include multiple related changes in one slice when they share one architectural purpose and can be tested together.
+- Do not bundle unrelated work, risky rewrites, or broad reforms just to reduce the number of slices.
+- Choose slice size by quality, failure risk, reviewability, and validation path, not by a fixed preference for small or large changes.
+- Keep files and modules focused on one clear responsibility, but allow one slice to touch several focused files when that is the coherent implementation unit.
+- For larger slices, explicitly name scope, architecture decisions, important file groups, validation, and deliberately excluded topics in the completion report.
 - Keep simulation data, runtime snapshots, rendering, UI, and debug separate.
 - A cell is data, not a Godot node.
 - The only public cell placement API is `SimulationService.place_cell()`.
