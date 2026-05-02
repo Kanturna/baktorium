@@ -3,6 +3,7 @@ extends Node2D
 
 const CellFunctionCatalog = preload("res://src/sim/catalog/cell_function_catalog.gd")
 const DebugMenuAdapter = preload("res://src/debug/debug_menu_adapter.gd")
+const EnergyConfig = preload("res://src/sim/energy/energy_config.gd")
 const HexOrganismRenderer = preload("res://src/rendering/hex_organism_renderer.gd")
 const HexRenderConfig = preload("res://src/rendering/hex_render_config.gd")
 const OrganismSnapshotBuilder = preload("res://src/runtime/organism_snapshot_builder.gd")
@@ -14,17 +15,21 @@ const ORGANISM_ID = 1
 
 @export var seed: int = 1
 @export var render_config: HexRenderConfig
+@export var energy_config: EnergyConfig
 
 var service: SimulationService
 var catalog: CellFunctionCatalog
 var renderer: HexOrganismRenderer
 var info_label: Label
 var perf_probe = PerfProbe.new()
+var energy_accumulator: float = 0.0
 
 
 func _ready() -> void:
 	if render_config == null:
 		render_config = load("res://resources/render/starter_bacterium_render_config.tres").duplicate(true)
+	if energy_config == null:
+		energy_config = load("res://resources/sim/starter_energy_config.tres").duplicate(true)
 
 	catalog = CellFunctionCatalog.default_catalog()
 	service = SimulationService.new()
@@ -45,6 +50,22 @@ func _ready() -> void:
 
 	_create_ui()
 	_rebuild()
+
+
+func _process(delta: float) -> void:
+	if service == null or catalog == null or energy_config == null:
+		return
+	energy_accumulator += delta
+	var tick_interval = maxf(0.05, energy_config.tick_interval_seconds)
+	var ticked = false
+	while energy_accumulator >= tick_interval:
+		energy_accumulator -= tick_interval
+		var tick_start = Time.get_ticks_usec()
+		if service.tick_energy(ORGANISM_ID, catalog, energy_config):
+			perf_probe.energy_tick_usec = Time.get_ticks_usec() - tick_start
+			ticked = true
+	if ticked:
+		_refresh_snapshot()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -92,9 +113,19 @@ func _rebuild() -> void:
 	var body = StarterBacteriumFactory.new().build(service, ORGANISM_ID, seed)
 	perf_probe.body_build_usec = Time.get_ticks_usec() - body_start
 	perf_probe.cell_count = body.get_cell_count()
+	service.reset_energy(ORGANISM_ID, catalog, energy_config)
+	energy_accumulator = 0.0
+	_refresh_snapshot()
 
+
+func _refresh_snapshot() -> void:
+	var body = service.get_body(ORGANISM_ID)
+	if body == null:
+		return
 	var snapshot_start = Time.get_ticks_usec()
-	var snapshot = OrganismSnapshotBuilder.build(body, catalog)
+	var energy_metrics = service.get_energy_metrics(ORGANISM_ID)
+	energy_metrics["low_energy_ratio"] = energy_config.low_energy_ratio
+	var snapshot = OrganismSnapshotBuilder.build(body, catalog, energy_metrics)
 	perf_probe.snapshot_build_usec = Time.get_ticks_usec() - snapshot_start
 	renderer.set_snapshot(snapshot)
 	_update_label()
@@ -103,10 +134,23 @@ func _rebuild() -> void:
 func _update_label() -> void:
 	if info_label == null:
 		return
-	info_label.text = "Baktorium Slice 1\nSeed: %d\nCells: %d\nBody: %dus Snapshot: %dus\nD Debug  F Flow:%s  N/B Seed  F3 DebugMenu" % [
+	var energy_metrics = service.get_energy_metrics(ORGANISM_ID) if service != null else {}
+	var current_energy = float(energy_metrics.get("current_energy", 0.0))
+	var max_energy = float(energy_metrics.get("max_energy", 0.0))
+	var energy_ratio = float(energy_metrics.get("energy_ratio", 0.0))
+	var low_marker = " LOW" if max_energy > 0.0 and energy_ratio <= energy_config.low_energy_ratio else ""
+	info_label.text = "Baktorium Slice 2\nSeed: %d\nCells: %d\nEnergy: %.1f/%.1f%s\nProd: %.1f  Maint: %.1f  Net: %.1f  Tick: %d\nBody: %dus Energy: %dus Snapshot: %dus\nD Debug  F Flow:%s  N/B/R Seed  F3 DebugMenu" % [
 		seed,
 		perf_probe.cell_count,
+		current_energy,
+		max_energy,
+		low_marker,
+		float(energy_metrics.get("last_production", 0.0)),
+		float(energy_metrics.get("last_maintenance", 0.0)),
+		float(energy_metrics.get("last_net", 0.0)),
+		int(energy_metrics.get("tick_index", 0)),
 		perf_probe.body_build_usec,
+		perf_probe.energy_tick_usec,
 		perf_probe.snapshot_build_usec,
 		"on" if render_config.flow_enabled else "off",
 	]

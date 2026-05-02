@@ -43,6 +43,12 @@ The first renderer uses `Node2D._draw()` plus optional adapter-based antialiased
 
 Visual differences between cell functions are driven by render metadata copied into the snapshot. Renderers may branch on accent recipe names, not on simulation function ids.
 
+## Energy Contract
+
+Energy state is simulation truth and stays behind `SimulationService`. Runtime snapshots may carry copied energy metrics and derived per-cell render fields, but rendering and scenes must not hold mutable `OrganismEnergyState` references.
+
+Slice 2 uses the lab scene as composition root for fixed ticks. This is a deliberate local driver, not a global simulation clock.
+
 ## Asset Contract
 
 External plugins live in `addons/` and are connected through adapter scripts. They may improve rendering or debugging, but they do not own simulation state.

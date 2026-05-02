@@ -7,6 +7,7 @@ extends Resource
 @export var accent_color: Color = Color.WHITE
 @export_enum("none", "glow_disc", "surface_dot", "ring_arc") var accent_kind: String = "none"
 @export var energy_production: float = 0.0
+@export var energy_capacity: float = 0.0
 @export var maintenance_cost: float = 0.0
 @export var growth_cost: float = 0.0
 @export var protection_value: float = 0.0

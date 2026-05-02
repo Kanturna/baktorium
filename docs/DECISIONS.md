@@ -56,3 +56,26 @@ Reason: Flow is useful for first visual calibration, but later growth/performanc
 Decision: Cell-specific accent style and boundary outline emphasis live on `CellFunctionDef`, not as hard-coded renderer branches per function id.
 
 Reason: Slice 2+ can add visible cell functions without rewriting renderer logic or mixing simulation identity with presentation recipes.
+
+## ADR-007: Energy Tick Architecture
+
+Decision: Slice 2 energy is an organism-level pool owned by simulation state, not per-cell mutable energy.
+
+Implementation:
+
+- `OrganismEnergyState` is a sim-internal RefCounted state object.
+- `EnergySystem.tick(body, catalog, state, config)` is a static, stateless calculation path.
+- `EnergySystem.tick()` may mutate `OrganismEnergyState`, but must not mutate `OrganismBody`.
+- `SimulationService` stores energy states privately in `_energy_states_by_id`.
+- Public energy access goes through `reset_energy()`, `tick_energy()`, and `get_energy_metrics()`.
+- `CellFunctionDef.energy_capacity` is the canonical schema field for energy storage capacity.
+
+Reason: This preserves the Slice 1 service/snapshot boundary while adding the first active simulation system.
+
+## ADR-008: Slice 2 Tick Mechanism
+
+Decision: Slice 2 uses the lab scene's `_process(delta)` as the composition-root driver for fixed energy ticks.
+
+Reason: Slice 2 has one visible organism and no global world clock. A `TimeService` autoload would add global state and test mocking overhead before multiple organisms or a world grid exist.
+
+Re-evaluation trigger: before Slice 5, reassess whether WorldGrid or multiple organisms require a shared `TimeService`.

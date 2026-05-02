@@ -2,48 +2,38 @@
 
 ## Immediate Gate
 
-Validate Slice 1:
+Validate Slice 2:
 
 ```powershell
-D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_slice_1_validation.gd
+D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_slice_2_validation.gd
 ```
 
 Then open the lab scene in Godot and check:
 
 - the seven-cell starter bacterium is visible,
 - all four function types are visually distinct,
+- energy rises toward the maximum,
+- the energy core and photosynthesis cells show subtle energy feedback,
 - debug overlay toggles with `D`,
 - flow toggles with `F`,
 - Debug Menu toggles with `F3`,
+- seed reset/rebuild with `N`, `B`, and `R` keeps the body at seven cells,
 - no logical cell gaps are visible.
 
-## Slice 1 Commit Suggestions
+## After Slice 2
 
-1A:
+Do not start growth until Slice 2 energy behavior and visual feedback have been reviewed.
 
-```text
-docs: establish slice 1 foundation
-```
+## Slice 2 Commit Suggestions
 
-1B:
+2A:
 
 ```text
-feat: add starter bacterium body model
+feat(sim): add organism energy tick
 ```
 
-1C:
+2B:
 
 ```text
-feat: render starter bacterium lab
+feat(runtime): expose energy feedback in lab
 ```
-
-1D:
-
-```text
-feat: add visual polish adapters
-```
-
-## After Slice 1
-
-Do not start energy or growth until the visual starter bacterium has been reviewed.
-

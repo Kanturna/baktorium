@@ -63,6 +63,7 @@ func _draw_cell(cell_data: Dictionary) -> void:
 	var center = _coord_to_pixel(cell_data["coord"])
 	var polygon = _translated_polygon(center)
 	var color: Color = cell_data["base_color"]
+	color = _apply_energy_tint(color, cell_data)
 	color.a = render_config.cell_fill_alpha
 	draw_colored_polygon(polygon, color)
 
@@ -74,20 +75,30 @@ func _draw_cell(cell_data: Dictionary) -> void:
 
 
 func _draw_accent(center: Vector2, cell_data: Dictionary) -> void:
+	var energy_activity = clampf(float(cell_data.get("energy_activity", 0.0)), 0.0, 1.0)
 	match cell_data.get("accent_kind", "none"):
 		"glow_disc":
 			var glow_color: Color = cell_data["accent_color"]
-			glow_color.a = render_config.glow_strength
-			draw_circle(center, render_config.hex_radius * 0.44, glow_color)
+			glow_color.a = clampf(render_config.glow_strength + energy_activity * 0.28, 0.0, 0.92)
+			draw_circle(center, render_config.hex_radius * (0.40 + energy_activity * 0.10), glow_color)
 			draw_circle(center, render_config.hex_radius * 0.18, cell_data["accent_color"])
 		"surface_dot":
 			var accent: Color = cell_data["accent_color"]
-			accent.a = 0.65
-			draw_circle(center + Vector2(0, -render_config.hex_radius * 0.12), render_config.hex_radius * 0.16, accent)
+			accent.a = clampf(0.45 + energy_activity * 0.35, 0.0, 0.90)
+			draw_circle(center + Vector2(0, -render_config.hex_radius * 0.12), render_config.hex_radius * (0.14 + energy_activity * 0.04), accent)
 		"ring_arc":
 			var accent_repro: Color = cell_data["accent_color"]
 			accent_repro.a = 0.55
 			draw_arc(center, render_config.hex_radius * 0.24, 0.0, TAU, 24, accent_repro, 3.0, true)
+
+
+func _apply_energy_tint(base_color: Color, cell_data: Dictionary) -> Color:
+	var energy_ratio = clampf(float(cell_data.get("energy_tint_strength", 0.0)), 0.0, 1.0)
+	var energy_activity = clampf(float(cell_data.get("energy_activity", 0.0)), 0.0, 1.0)
+	if cell_data.get("energy_low", false):
+		return base_color.lerp(Color(1.0, 0.24, 0.18, 1.0), 0.18)
+	var tint_strength = clampf(energy_ratio * 0.08 + energy_activity * 0.12, 0.0, 0.24)
+	return base_color.lerp(Color(1.0, 0.92, 0.46, 1.0), tint_strength)
 
 
 func _draw_boundary_edge(edge: Dictionary) -> void:

@@ -2,7 +2,7 @@
 
 ## Current Slice
 
-Slice 1: Startfundament + First Visible Bacterium.
+Slice 2: Energy v0.
 
 ## Implemented In This Slice
 
@@ -15,10 +15,10 @@ Slice 1: Startfundament + First Visible Bacterium.
 - Headless validation scripts under `tests/headless/`.
 - Claude Code Slice 1 review hardening: private body storage, documented plugin autoloads, `requires_surface`, stronger validation.
 - Claude Code follow-up hardening: private `SimulationService` storage, data-driven visual accent metadata, stricter plugin adapter boundary tests, typed lab/config and cell coordinate fields.
+- Organism-pool energy state, fixed energy ticks, energy config resource, energy snapshot fields, lab HUD energy feedback, and 100-cell stress validation.
 
 ## Not Implemented
 
-- Energy ticks.
 - Growth.
 - Mutation.
 - World grid.
@@ -31,5 +31,5 @@ Slice 1: Startfundament + First Visible Bacterium.
 Run after changes:
 
 ```powershell
-D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_slice_1_validation.gd
+D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_slice_2_validation.gd
 ```
