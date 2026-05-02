@@ -1,7 +1,7 @@
 class_name HexCoord
 extends RefCounted
 
-static var _script_cache = null
+const HEX_COORD_SCRIPT = preload("res://src/core/hex/hex_coord.gd")
 
 var q: int
 var r: int
@@ -45,9 +45,7 @@ static func from_key(key: String):
 
 
 static func _new_coord(p_q: int = 0, p_r: int = 0):
-	if _script_cache == null:
-		_script_cache = load("res://src/core/hex/hex_coord.gd")
-	return _script_cache.new(p_q, p_r)
+	return HEX_COORD_SCRIPT.new(p_q, p_r)
 
 
 func _to_string() -> String:

@@ -15,9 +15,9 @@ const ORGANISM_ID = 1
 @export var seed: int = 1
 @export var render_config: HexRenderConfig
 
-var service
-var catalog
-var renderer
+var service: SimulationService
+var catalog: CellFunctionCatalog
+var renderer: HexOrganismRenderer
 var info_label: Label
 var perf_probe = PerfProbe.new()
 

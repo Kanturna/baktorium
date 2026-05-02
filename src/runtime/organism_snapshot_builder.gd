@@ -10,6 +10,7 @@ const OrganismRenderSnapshot = preload("res://src/runtime/organism_render_snapsh
 static func build(body, catalog):
 	var snapshot = OrganismRenderSnapshot.new(body.organism_id, body.seed)
 	var keys = body.get_cell_keys()
+	var boundary_outline_scale_by_function_id = _build_boundary_outline_scale_map(catalog)
 
 	for key in keys:
 		var cell = body.get_cell_by_key(key)
@@ -30,9 +31,19 @@ static func build(body, catalog):
 		})
 
 	for edge in body.get_boundary_edges():
-		var edge_definition = catalog.get_definition(edge["function_id"]) if catalog != null else null
 		var edge_copy = edge.duplicate(true)
-		edge_copy["boundary_outline_scale"] = edge_definition.boundary_outline_scale if edge_definition != null else 1.0
+		edge_copy["boundary_outline_scale"] = boundary_outline_scale_by_function_id.get(edge["function_id"], 1.0)
 		snapshot.boundary_edges.append(edge_copy)
 	snapshot.cell_count = snapshot.cells.size()
 	return snapshot
+
+
+static func _build_boundary_outline_scale_map(catalog) -> Dictionary:
+	var result: Dictionary = {}
+	if catalog == null:
+		return result
+	for function_id in catalog.ids():
+		var definition = catalog.get_definition(function_id)
+		if definition != null:
+			result[function_id] = definition.boundary_outline_scale
+	return result

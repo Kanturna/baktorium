@@ -126,6 +126,8 @@ Examples:
 
 When the user provides an external analysis, evaluation, review, or cross-agent critique, treat it as structured implementation input, not as background context.
 
+This protocol runs alongside Documentation Sync and Completion Protocol: per-finding evidence becomes part of the completion report; `document as open finding` writes to `docs/FINDINGS.md`; findings that match Decision Triggers also update `docs/DECISIONS.md`.
+
 Required process:
 
 - Extract every concrete finding into an internal checklist before editing.
