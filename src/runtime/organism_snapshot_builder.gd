@@ -9,11 +9,10 @@ const OrganismRenderSnapshot = preload("res://src/runtime/organism_render_snapsh
 
 static func build(body, catalog):
 	var snapshot = OrganismRenderSnapshot.new(body.organism_id, body.seed)
-	var keys = body.cells_by_key.keys()
-	keys.sort()
+	var keys = body.get_cell_keys()
 
 	for key in keys:
-		var cell = body.cells_by_key[key]
+		var cell = body.get_cell_by_key(key)
 		var definition = catalog.get_definition(cell.function_id) if catalog != null else null
 		var base_color = definition.base_color if definition != null else Color.WHITE
 		var accent_color = definition.accent_color if definition != null else Color.WHITE

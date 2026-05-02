@@ -12,5 +12,5 @@ energy_production = 0.0
 maintenance_cost = 0.0
 growth_cost = 0.0
 protection_value = 0.0
+requires_surface = true
 visual_weight = 1.0
-

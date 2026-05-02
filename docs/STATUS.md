@@ -13,6 +13,7 @@ Slice 1: Startfundament + First Visible Bacterium.
 - Starter bacterium lab scene with seven-cell body.
 - Built-in renderer, debug overlay, optional flow config, plugin adapters.
 - Headless validation scripts under `tests/headless/`.
+- Claude Code Slice 1 review hardening: private body storage, documented plugin autoloads, `requires_surface`, stronger validation.
 
 ## Not Implemented
 
@@ -30,4 +31,3 @@ Run after changes:
 ```powershell
 D:\Programme\Godot\Godot.exe --headless --path D:\Projekte\Godot\baktorium --script res://tests/headless/run_slice_1_validation.gd
 ```
-

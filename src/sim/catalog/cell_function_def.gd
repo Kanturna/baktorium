@@ -9,5 +9,5 @@ extends Resource
 @export var maintenance_cost: float = 0.0
 @export var growth_cost: float = 0.0
 @export var protection_value: float = 0.0
+@export var requires_surface: bool = false
 @export var visual_weight: float = 1.0
-

@@ -35,9 +35,16 @@ Rules:
 - Built-in `_draw()` remains the fallback for organism rendering.
 - Assets must not write simulation state.
 
+Plugin-mandatory autoloads:
+
+- `AntialiasedLine2DTexture` is required by Antialiased Line2D.
+- `DebugMenu` is required by Debug Menu.
+- Both autoloads are plugin/tooling autoloads, not simulation autoloads.
+- They do not own or mutate simulation truth.
+- They do not count as future Baktorium simulation autoloads such as `TimeService`.
+
 ## ADR-005: Flow Is Optional
 
 Decision: `HexRenderConfig.flow_enabled` defaults to `false`.
 
 Reason: Flow is useful for first visual calibration, but later growth/performance work should not inherit a mandatory animation cost.
-

@@ -7,7 +7,7 @@ const HexGridMath = preload("res://src/core/hex/hex_grid_math.gd")
 
 var organism_id: int
 var seed: int
-var cells_by_key: Dictionary = {}
+var _cells_by_key: Dictionary = {}
 
 
 func _init(p_organism_id: int = 1, p_seed: int = 1) -> void:
@@ -17,26 +17,36 @@ func _init(p_organism_id: int = 1, p_seed: int = 1) -> void:
 
 func _place_cell_internal(cell) -> bool:
 	var key = cell.coord.to_key()
-	if cells_by_key.has(key):
+	if _cells_by_key.has(key):
 		return false
-	cells_by_key[key] = cell
+	_cells_by_key[key] = cell
 	return true
 
 
 func has_cell(coord) -> bool:
-	return cells_by_key.has(coord.to_key())
+	return _cells_by_key.has(coord.to_key())
 
 
 func get_cell(coord):
-	return cells_by_key.get(coord.to_key())
+	return _cells_by_key.get(coord.to_key())
+
+
+func get_cell_by_key(key: String):
+	return _cells_by_key.get(key)
+
+
+func get_cell_keys() -> Array:
+	var keys = _cells_by_key.keys()
+	keys.sort()
+	return keys
 
 
 func get_cells() -> Array:
-	return cells_by_key.values()
+	return _cells_by_key.values()
 
 
 func get_cell_count() -> int:
-	return cells_by_key.size()
+	return _cells_by_key.size()
 
 
 func get_boundary_edges() -> Array:
@@ -63,10 +73,10 @@ func is_boundary_cell(coord) -> bool:
 
 
 func is_body_connected() -> bool:
-	if cells_by_key.is_empty():
+	if _cells_by_key.is_empty():
 		return true
 
-	var keys = cells_by_key.keys()
+	var keys = _cells_by_key.keys()
 	var start_key: String = keys[0]
 	var visited = {}
 	var queue: Array[String] = [start_key]
@@ -74,11 +84,11 @@ func is_body_connected() -> bool:
 
 	while not queue.is_empty():
 		var current_key: String = queue.pop_front()
-		var current_cell = cells_by_key[current_key]
+		var current_cell = _cells_by_key[current_key]
 		for neighbor_coord in HexGridMath.neighbors(current_cell.coord):
 			var neighbor_key = neighbor_coord.to_key()
-			if cells_by_key.has(neighbor_key) and not visited.has(neighbor_key):
+			if _cells_by_key.has(neighbor_key) and not visited.has(neighbor_key):
 				visited[neighbor_key] = true
 				queue.append(neighbor_key)
 
-	return visited.size() == cells_by_key.size()
+	return visited.size() == _cells_by_key.size()

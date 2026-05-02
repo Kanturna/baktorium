@@ -9,6 +9,7 @@ func _initialize() -> void:
 	_validate_neighbors(failures)
 	_validate_distance(failures)
 	_validate_pixel_mapping(failures)
+	_validate_key_roundtrip(failures)
 	_finish("Slice 1A hex validation", failures)
 
 
@@ -40,6 +41,14 @@ func _validate_pixel_mapping(failures: Array[String]) -> void:
 	var polygon = HexGridMath.polygon_points(42.0, true)
 	if polygon.size() != 6:
 		failures.append("Hex polygon should have 6 points.")
+
+
+func _validate_key_roundtrip(failures: Array[String]) -> void:
+	var coord = HexCoord.from_key("-2,3")
+	if coord.q != -2 or coord.r != 3:
+		failures.append("HexCoord.from_key() should round-trip q/r.")
+	if coord.to_key() != "-2,3":
+		failures.append("HexCoord.to_key() should round-trip from_key().")
 
 
 func _finish(label: String, failures: Array[String]) -> void:

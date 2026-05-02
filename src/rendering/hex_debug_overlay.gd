@@ -30,5 +30,6 @@ static func draw_cell_label(canvas: CanvasItem, position: Vector2, cell_data: Di
 		HORIZONTAL_ALIGNMENT_CENTER,
 		-1.0,
 		font_size,
+		-1,
 		config.label_color
 	)

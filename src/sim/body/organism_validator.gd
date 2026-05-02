@@ -43,7 +43,7 @@ static func validate_starter_body(body, catalog) -> Array:
 		errors.append("Starter body expected %d cells, found %d." % [expected.size(), body.get_cell_count()])
 
 	for key in expected.keys():
-		var cell = body.cells_by_key.get(key)
+		var cell = body.get_cell_by_key(key)
 		if cell == null:
 			errors.append("Missing starter cell at %s." % key)
 		elif cell.function_id != expected[key]:

@@ -95,7 +95,8 @@ func _draw_boundary_edge(edge: Dictionary) -> void:
 	var color: Color = segment["color"]
 	if not HexOutlineDrawer.plugin_available():
 		HexOutlineDrawer.draw_edge(self, from_point, to_point, color, width)
-	WallFlowRenderer.draw_flow_edge(self, from_point, to_point, color, width, elapsed_seconds, coord.q * 131 + coord.r * 71 + direction, render_config)
+	if render_config.flow_enabled:
+		WallFlowRenderer.draw_flow_edge(self, from_point, to_point, color, width, elapsed_seconds, coord.q * 131 + coord.r * 71 + direction, render_config)
 
 
 func _coord_to_pixel(coord) -> Vector2:

@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="baktorium"
-run/main_scene="uid://dbke7vdra2t0r"
+run/main_scene="res://scenes/lab/starter_bacterium_lab.tscn"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
 
