@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CellFunctionDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/sim/catalog/cell_function_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"energy_core"
+display_name = "Energy Core"
+base_color = Color(0.94, 0.62, 0.20, 1)
+accent_color = Color(1.00, 0.90, 0.38, 1)
+energy_production = 0.0
+maintenance_cost = 0.0
+growth_cost = 0.0
+protection_value = 0.0
+visual_weight = 1.0
+
